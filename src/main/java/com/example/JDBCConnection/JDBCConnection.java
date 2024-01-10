@@ -13,7 +13,7 @@ public class JDBCConnection {
     public JDBCConnection() {
     }
 
-    private static final String DATABASE1 = "jdbc:sqlite:database/TempPopulation.db/";
+    private static final String DATABASE1 = "jdbc:sqlite:database/TempPopulation.db";
     // private static final String DATABASE2 = "jdbc:sqlite:database/Personas + Students.db";
 
     public ArrayList<String> getResultByCountryName() { //change the return type (TODO) (this method gets an ArrayList of country names)
