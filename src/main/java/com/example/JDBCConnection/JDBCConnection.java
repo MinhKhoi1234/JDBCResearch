@@ -97,22 +97,16 @@ public class JDBCConnection {
 
             String query = "";
 
-            if(LANDorGLOBALorPopulation.equalsIgnoreCase("LAND") || LANDorGLOBALorPopulation.equalsIgnoreCase("GLOBAL")) {
-                if(LANDorGLOBALorPopulation.equalsIgnoreCase("LAND")) {
-                    query = "SELECT " + MINorMAX + "(Year) FROM GlobalYearlyLandTempByCountry;";
-                } else if (LANDorGLOBALorPopulation.equalsIgnoreCase("GLOBAL")) {
-                    query = "SELECT " + MINorMAX + "(Year) FROM GlobalYearlyTemp;";
-                }
-
-                ResultSet results = statement.executeQuery(query);
-                year     = results.getInt(MINorMAX + "(Year)");
+            if(LANDorGLOBALorPopulation.equalsIgnoreCase("LAND")) {
+                query = "SELECT " + MINorMAX + "(Year) FROM GlobalYearlyLandTempByCountry;";
+            } else if (LANDorGLOBALorPopulation.equalsIgnoreCase("GLOBAL")) {
+                query = "SELECT " + MINorMAX + "(Year) FROM GlobalYearlyTemp;";
+            } else if (LANDorGLOBALorPopulation.equalsIgnoreCase("Population")) {
+                query = "SELECT " + MINorMAX + "(Year) FROM Population;";
             }
 
-            else if (LANDorGLOBALorPopulation.equalsIgnoreCase("POPULATION")) {
-                query = "SELECT " + MINorMAX + "(name) FROM pragma_table_info('Population') WHERE name GLOB '[0-9]*';";
-                ResultSet results = statement.executeQuery(query);
-                year     = results.getInt(MINorMAX + "(name)");
-            }
+            ResultSet results = statement.executeQuery(query);
+            year     = results.getInt(1);
 
             statement.close();
         } catch (SQLException e) {
