@@ -521,10 +521,10 @@ public class JDBCConnection {
             
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
-            boolean exists = resultSet.getBoolean(1);
-            if (!exists) {
-                return data;
-            }
+                boolean exists = resultSet.getBoolean(1);
+                if (!exists) {
+                    return data;
+                }
             } 
             //Find available first and last year
             query = "SELECT MIN(Year) FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "';";
