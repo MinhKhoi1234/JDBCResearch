@@ -463,50 +463,14 @@ public class JDBCConnection {
                 }
         }
 
+        Sort(result);
+        Reverse(result);
+
         return result;
     }
 
     public static ArrayList<SubTaskB> similarTemp (int startingYear, int timePeriod, String selectedRegion, int region, int mode){
         ArrayList<SubTaskB> result = new ArrayList<>();
-        switch(region){
-            case 1:
-                result = similarTempCountry(startingYear, timePeriod, selectedRegion, mode);
-                break;
-            case 2:
-            result = similarTempState(startingYear, timePeriod, selectedRegion, mode);
-                break;
-            case 3:
-            result = similarTempCity(startingYear, timePeriod, selectedRegion, mode);
-                break;
-        }
-        
-        Collections.sort(result, new Comparator<SubTaskB>() {
-            @Override
-            public int compare(SubTaskB o1, SubTaskB o2) {
-                return Double.compare(o1.getSimilarRate(), o2.getSimilarRate());
-            }
-        });
-        Collections.reverse(result);
-        return result;
-    }
-
-
-    public static ArrayList<SubTaskB> similarPopulation (int startingYear, int timePeriod, String selectedRegion, int mode){
-        ArrayList<SubTaskB> result = new ArrayList<>();
-
-
-        return result;
-    }
-
-    public static ArrayList<SubTaskB> similarTempAndPopulation (int startingYear, int timePeriod, String selectedRegion, int mode){
-        ArrayList<SubTaskB> result = new ArrayList<>();
-        
-
-        return result;
-    }
-
-    public static ArrayList<SubTaskB> similarTempCountry(int startingYear, int timePeriod, String selectedRegion, int mode){
-        ArrayList<SubTaskB> data = new ArrayList<>();
         
         Connection connection = null;
 
@@ -517,63 +481,105 @@ public class JDBCConnection {
             statement.setQueryTimeout(30);
 
             //Check if the country exists
-            String query = "SELECT EXISTS (SELECT 1 FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "')";
+            String query = "SELECT EXISTS";
+
+            switch(region){
+                case 1:
+                    query = query + " (SELECT 1 FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "')";
+                    break;
+                case 2:
+                    query = query + " (SELECT 1 FROM GlobalYearlyLandTempByState WHERE State = '" + selectedRegion + "')";
+                    break;
+                case 3:
+                    query = query + " (SELECT 1 FROM GlobalYearlyLandTempByCity WHERE City = '" + selectedRegion + "')";
+                    break;
+            }
             
             ResultSet resultSet = statement.executeQuery(query);
-            if (resultSet.next()) {
-                boolean exists = resultSet.getBoolean(1);
-                if (!exists) {
-                    return data;
-                }
-            } 
+            if (resultSet.next() && !resultSet.getBoolean(1)) {
+                System.out.println("Does not exist\n");
+                System.out.println(selectedRegion);
+                return result;
+            }
+
             //Find available first and last year
-            query = "SELECT MIN(Year) FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "';";
+            query = "SELECT MIN(Year) AS Min, MAX(Year) AS Max";
+
+            switch(region){
+                case 1:
+                    query = query + " FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "'";
+                    break;
+                case 2:
+                    query = query + " FROM GlobalYearlyLandTempByState WHERE State = '" + selectedRegion + "'";
+                    break;
+                case 3:
+                    query = query + " FROM GlobalYearlyLandTempByCity WHERE City = '" + selectedRegion + "'";
+                    break;
+            }
 
             int beginYear = 0;
             int endYear = 0;
             ResultSet results = statement.executeQuery(query);
             if (results.next()){
-                beginYear = results.getInt(1);
+                beginYear = results.getInt("Min");
+                endYear = results.getInt("Max");
+            }
+            statement.close();
+
+
+            //Find average temperature of the selected region in a certain time period
+            query = "SELECT AVG(AverageTemperature) AS Avg ";
+
+            switch(region){
+                case 1:
+                    query = query + "FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "' AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "')";
+                    break;
+                case 2:
+                    query = query + "FROM GlobalYearlyLandTempByState WHERE State = '" + selectedRegion + "' AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "')";
+                    break;
+                case 3:
+                    query = query + "FROM GlobalYearlyLandTempByCity WHERE City = '" + selectedRegion + "' AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "')";
+                    break;
             }
 
-            query = "SELECT MAX(Year) FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "';";
             results = statement.executeQuery(query);
-            if (results.next()){
-                endYear = results.getInt(1);
-            }
-
-            query = "SELECT AverageTemperature FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "' AND (Year >= '" + startingYear + "' AND Year < '" + (startingYear + timePeriod) + "');";
-
-            results = statement.executeQuery(query);
-            double total = 0;
-
+            double avg = 0;
             while (results.next()) {
-
-                total += results.getDouble("AverageTemperature");
+                avg = results.getDouble("Avg");
             }
-            double avg = total / timePeriod;
 
             statement.close();
 
+            //Find average temperature of the selected region in various time period
             double average;
             double similarRate;
             for(int i = beginYear; i <= endYear - (timePeriod - 1); i++){
                 average = 0;
-                total = 0;
-                query = "SELECT AverageTemperature FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "' AND (Year >= '" + i + "' AND Year < '" + (i + timePeriod) + "');";
-                results = statement.executeQuery(query);
-                while (results.next()) {
-                    total += results.getDouble("AverageTemperature");
+                query = "SELECT AVG(AverageTemperature) AS Avg ";
+
+                switch(region){
+                    case 1:
+                        query = query + "FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "' AND (Year BETWEEN'" + i + "' AND '" + (i + timePeriod - 1) + "')";
+                        break;
+                    case 2:
+                        query = query + "FROM GlobalYearlyLandTempByState WHERE State = '" + selectedRegion + "' AND (Year BETWEEN'" + i + "' AND '" + (i + timePeriod - 1) + "')";
+                        break;
+                    case 3:
+                        query = query + "FROM GlobalYearlyLandTempByCity WHERE City = '" + selectedRegion + "' AND (Year BETWEEN'" + i + "' AND '" + (i + timePeriod - 1) + "')";
+                        break;
                 }
-                average = total / timePeriod;
+                results = statement.executeQuery(query);
+                if (results.next()) {
+                    average = results.getDouble("Avg");
+                }
                 if (mode == 1){
                     similarRate = Math.abs(average - avg);
                 }
                 else{
                     similarRate = Math.abs((average - avg) / avg) * 100;
                 }
-                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, average, 0, similarRate);
-                data.add(temp);
+                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, average, 0, similarRate, selectedRegion, region);
+                result.add(temp);
                 statement.close();
             }
 
@@ -590,18 +596,206 @@ public class JDBCConnection {
             }
         }
 
-        return data;
+        return result;
     }
 
-    public static ArrayList<SubTaskB> similarTempState(int startingYear, int timePeriod, String selectedRegion, int mode){
+    public static ArrayList<SubTaskB> similarPopulation (int startingYear, int timePeriod, String selectedRegion, int mode){
         ArrayList<SubTaskB> result = new ArrayList<>();
+        
+        Connection connection = null;
+
+        try{
+            connection = DriverManager.getConnection(DATABASE1);
+
+            Statement statement = connection.createStatement();
+            statement.setQueryTimeout(30);
+
+            //Check if the country exists
+            String query = "SELECT EXISTS (SELECT 1 FROM Population WHERE Country_Name = '" + selectedRegion + "')";
+            
+            ResultSet resultSet = statement.executeQuery(query);
+            if (resultSet.next() && !resultSet.getBoolean(1)) {
+                System.out.println("Does not exist\n");
+                return result;
+            }
+
+            //Find available first and last year
+            query = "SELECT MIN(Year) AS Min, MAX(Year) AS Max FROM Population WHERE Country_Name = '" + selectedRegion + "'";
+
+            int beginYear = 0;
+            int endYear = 0;
+            ResultSet results = statement.executeQuery(query);
+            if (results.next()){
+                beginYear = results.getInt("Min");
+                endYear = results.getInt("Max");
+            }
+            statement.close();
+
+
+            //Find average population of the selected region in a certain time period
+            query = "SELECT AVG(Population) AS Avg FROM Population WHERE Country_Name = '" + selectedRegion + "' AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "')";
+            results = statement.executeQuery(query);
+            double avg = 0;
+            while (results.next()) {
+                avg = results.getDouble("Avg");
+            }
+
+            statement.close();
+
+            //Find average temperature of the selected region in various time period
+            double average;
+            double similarRate;
+            for(int i = beginYear; i <= endYear - (timePeriod - 1); i++){
+                average = 0;
+                query = "SELECT AVG(Population) AS Avg FROM Population WHERE Country_Name = '" + selectedRegion + "' AND (Year BETWEEN'" + i + "' AND '" + (i + timePeriod - 1) + "')";
+                results = statement.executeQuery(query);
+                if (results.next()) {
+                    average = results.getDouble("Avg");
+                }
+                if (mode == 1){
+                    similarRate = Math.abs(average - avg);
+                }
+                else{
+                    similarRate = Math.abs((average - avg) / avg) * 100;
+                }
+                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, 0, (int) average, similarRate, selectedRegion, 1);
+                result.add(temp);
+                statement.close();
+            }
+
+
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
 
         return result;
     }
 
-    public static ArrayList<SubTaskB> similarTempCity(int startingYear, int timePeriod, String selectedRegion, int mode){
+    public static ArrayList<SubTaskB> similarTempAndPopulation (int startingYear, int timePeriod, String selectedRegion, int mode){
         ArrayList<SubTaskB> result = new ArrayList<>();
+        
+        Connection connection = null;
+
+        try{
+            connection = DriverManager.getConnection(DATABASE1);
+
+            Statement statement = connection.createStatement();
+            statement.setQueryTimeout(30);
+
+            //Check if the country exists
+            String query = "SELECT EXISTS (SELECT 1 FROM GlobalYearlyLandTempByCountry AS Temperature JOIN Population ON Temperature.Country = Population.Country_Name WHERE Country = '" + selectedRegion + "')";
+            
+            ResultSet resultSet = statement.executeQuery(query);
+            if (resultSet.next() && !resultSet.getBoolean(1)) {
+                System.out.println("Does not exist\n");
+                return result;
+            }
+
+            //Find available first and last year
+            query = "SELECT MIN(Year) AS Min, MAX(Year) AS Max FROM Population WHERE Country_Name = '" + selectedRegion + "'";
+
+            int beginYear = 0;
+            int endYear = 0;
+            ResultSet results = statement.executeQuery(query);
+            if (results.next()){
+                beginYear = results.getInt("Min");
+                endYear = results.getInt("Max");
+            }
+            statement.close();
+
+
+            //Find average population of the selected region in a certain time period
+            query = "SELECT AVG(Population) AS Avg FROM Population WHERE Country_Name = '" + selectedRegion + "' AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "')";
+            results = statement.executeQuery(query);
+            double avgPopulation = 0;
+            while (results.next()) {
+                avgPopulation = results.getDouble("Avg");
+            }
+
+            statement.close();
+
+            //Find average temperature of the selected region in a certain time period
+            query = "SELECT AVG(AverageTemperature) AS Avg FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "' AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "')";
+            results = statement.executeQuery(query);
+            double avgTemp = 0;
+            while (results.next()) {
+                avgTemp = results.getDouble("Avg");
+            }
+
+            statement.close();
+
+            //Find average temperature of the selected region in various time period
+            double averageTemp;
+            double averagePopulation;
+            double similarRate;
+            for(int i = beginYear; i <= endYear - (timePeriod - 1); i++){
+
+                averageTemp = 0;
+                averagePopulation = 0;
+
+                query = "SELECT AVG(Population) AS Avg FROM Population WHERE Country_Name = '" + selectedRegion + "' AND (Year BETWEEN'" + i + "' AND '" + (i + timePeriod - 1) + "')";
+                results = statement.executeQuery(query);
+                if (results.next()) {
+                    averagePopulation = results.getDouble("Avg");
+                }
+
+                query = "SELECT AVG(AverageTemperature) AS Avg FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "' AND (Year BETWEEN'" + i + "' AND '" + (i + timePeriod - 1) + "')";
+                results = statement.executeQuery(query);
+                if (results.next()) {
+                    averageTemp = results.getDouble("Avg");
+                }
+
+                if (mode == 1){
+                    similarRate = Math.sqrt(Math.pow(averageTemp - avgTemp, 2) + Math.pow(averagePopulation - avgPopulation, 2));
+                }
+                else{
+                    similarRate = Math.sqrt(Math.pow(((averageTemp - avgTemp) / avgTemp) * 100, 2) + Math.pow(((averagePopulation - avgPopulation) / avgPopulation) * 100, 2));
+                }
+                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, averageTemp, (int) averagePopulation, similarRate, selectedRegion, 1);
+                result.add(temp);
+                statement.close();
+            }
+
+
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
 
         return result;
     }
+
+public static ArrayList<SubTaskB> Sort (ArrayList<SubTaskB> data){
+    
+    Collections.sort(data, new Comparator<SubTaskB>() {
+        @Override
+        public int compare(SubTaskB o1, SubTaskB o2) {
+            return Double.compare(o1.getSimilarRate(), o2.getSimilarRate());
+        }
+    });
+
+    return data;
+}
+
+public static ArrayList<SubTaskB> Reverse (ArrayList<SubTaskB> data){
+    
+    Collections.reverse(data);
+
+    return data;
+}
 }
