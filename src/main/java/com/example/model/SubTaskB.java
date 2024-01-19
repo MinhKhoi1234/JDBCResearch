@@ -1,23 +1,26 @@
 package com.example.model;
 
 public class SubTaskB {
+
+    // region 1  = country, 2 = state, 3 = city
+    
     private int startingYear;
     private int endingYear;
     private double temp;
     private int population;
-    private double similarRate;
+    private double similarScore;
     private String regionName;
     private int type;
 
     public SubTaskB(){
     }
 
-    public SubTaskB (int startingYear, int endingYear, double avgTemp, int population, double similarRate, String regionName, int type){
+    public SubTaskB (int startingYear, int endingYear, double avgTemp, int population, double similarScore, String regionName, int type){
         this.startingYear = startingYear;
         this.endingYear = endingYear;
         this.temp = avgTemp;
         this.population = population;
-        this.similarRate = similarRate;
+        this.similarScore = similarScore;
         this.regionName = regionName;
         this.type = type;
     }
@@ -34,8 +37,8 @@ public class SubTaskB {
         return endingYear;
     }
 
-    public double getSimilarRate(){
-        return similarRate;
+    public double getSimilarScore(){
+        return similarScore;
     }
 
     public int getPopulation(){
@@ -62,8 +65,8 @@ public class SubTaskB {
         this.endingYear = endingYear;
     }
 
-    public void setSimilarRate(double similarRate){
-        this.similarRate = similarRate;
+    public void setSimilarScore(double similarRate){
+        this.similarScore = similarRate;
     }
 
     public void setPopulation(int avgPopulation){
@@ -86,6 +89,6 @@ public class SubTaskB {
                 "\nEnding Year: " + endingYear + 
                 "\nAverageTemperature: " + temp + 
                 "\nAverage Population: " + population + 
-                "\nSimilar Rate: " + similarRate + "\n\n";
+                "\nSimilar Score: " + similarScore + "\n\n";
     }
 }
