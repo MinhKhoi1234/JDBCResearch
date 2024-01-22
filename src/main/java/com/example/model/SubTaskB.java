@@ -2,25 +2,25 @@ package com.example.model;
 
 public class SubTaskB {
 
-    // region 1  = country, 2 = state, 3 = city
+    // region type 1 = country, 2 = state, 3 = city
     
     private int startingYear;
     private int endingYear;
     private double temp;
     private int population;
-    private double similarScore;
+    private double differenceScore;
     private String regionName;
     private int type;
 
     public SubTaskB(){
     }
 
-    public SubTaskB (int startingYear, int endingYear, double avgTemp, int population, double similarScore, String regionName, int type){
+    public SubTaskB (int startingYear, int endingYear, double avgTemp, int population, double differenceScore, String regionName, int type){
         this.startingYear = startingYear;
         this.endingYear = endingYear;
         this.temp = avgTemp;
         this.population = population;
-        this.similarScore = similarScore;
+        this.differenceScore = differenceScore;
         this.regionName = regionName;
         this.type = type;
     }
@@ -37,8 +37,8 @@ public class SubTaskB {
         return endingYear;
     }
 
-    public double getSimilarScore(){
-        return similarScore;
+    public double getDifferenceScore(){
+        return differenceScore;
     }
 
     public int getPopulation(){
@@ -65,8 +65,8 @@ public class SubTaskB {
         this.endingYear = endingYear;
     }
 
-    public void setSimilarScore(double similarRate){
-        this.similarScore = similarRate;
+    public void setDifferenceScore(double differenceScore){
+        this.differenceScore = differenceScore;
     }
 
     public void setPopulation(int avgPopulation){
@@ -89,6 +89,6 @@ public class SubTaskB {
                 "\nEnding Year: " + endingYear + 
                 "\nAverageTemperature: " + temp + 
                 "\nAverage Population: " + population + 
-                "\nSimilar Score: " + similarScore + "\n\n";
+                "\nDifference Score: " + differenceScore + "\n\n";
     }
 }

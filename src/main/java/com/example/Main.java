@@ -21,7 +21,7 @@ public class Main {
         long startTime = System.currentTimeMillis();
 
         ArrayList<SubTaskB> test = new ArrayList<SubTaskB>();
-        test = jdbcConnection.subTaskBTask2(1990, 10, "Vietnam", 1, 2, 1);
+        test = jdbcConnection.subTaskBTask2(1990, 10, "Vietnam", 1, 3, 1, true);
         if (!test.isEmpty()) {
             for(int i = 0; i < 10; i++){
                 System.out.println(test.get(i).toString());

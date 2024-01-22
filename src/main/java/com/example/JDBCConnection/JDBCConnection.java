@@ -12,6 +12,7 @@ import java.util.Comparator;
 
 import com.example.model.Input;
 import com.example.model.SubTaskB;
+import com.mysql.cj.x.protobuf.MysqlxDatatypes.Array;
 
 public class JDBCConnection {
     public JDBCConnection() {
@@ -438,7 +439,7 @@ public class JDBCConnection {
     }
 
     //Add more here
-    public ArrayList<SubTaskB> subTaskBTask1(int startingYear, int timePeriod, String selectedRegion, int region, int option, int mode){
+    public ArrayList<SubTaskB> subTaskBTask1(int startingYear, int timePeriod, String selectedRegion, int region, int option, int mode, boolean mostSimilar) {
         // region 1  = country, 2 = state, 3 = city
         // option 1 = temperature, 2 = population, 3 = both
         // mode 1 = absolute, 2 = relative
@@ -465,8 +466,12 @@ public class JDBCConnection {
                 }
         }
 
-        SortLowToHigh(result);
-        Reverse(result);
+        if(mostSimilar){
+            SortLowToHigh(result);
+        }
+        else{
+            SortHighToLow(result);
+        }
 
         return result;
     }
@@ -782,49 +787,18 @@ public class JDBCConnection {
         return result;
     }
 
-public static ArrayList<SubTaskB> SortHighToLow (ArrayList<SubTaskB> data){
-    
-    Collections.sort(data, new Comparator<SubTaskB>() {
-        @Override
-        public int compare(SubTaskB o1, SubTaskB o2) {
-            return Double.compare(o2.getSimilarScore(), o1.getSimilarScore());
-        }
-    });
-
-    return data;
-}
-
-public static ArrayList<SubTaskB> SortLowToHigh (ArrayList<SubTaskB> data){
-    
-    Collections.sort(data, new Comparator<SubTaskB>() {
-        @Override
-        public int compare(SubTaskB o1, SubTaskB o2) {
-            return Double.compare(o1.getSimilarScore(), o2.getSimilarScore());
-        }
-    });
-
-    return data;
-}
-
-public static ArrayList<SubTaskB> Reverse (ArrayList<SubTaskB> data){
-    
-    Collections.reverse(data);
-
-    return data;
-}
-
-public ArrayList<SubTaskB> subTaskBTask2 (int startingYear, int timePeriod, String selectedRegion, int region, int option, int mode){
+    public ArrayList<SubTaskB> subTaskBTask2 (int startingYear, int timePeriod, String selectedRegion, int region, int option, int mode, boolean mostSimilar){
     // region 1  = country, 2 = state, 3 = city
     // option 1 = temperature, 2 = population, 3 = both
     // mode 1 = absolute, 2 = relative
     ArrayList<SubTaskB> result = new ArrayList<SubTaskB>();
     switch(option){
         case 1:
-            result = similarTempTask2(startingYear, timePeriod, selectedRegion, region, mode);
+            result = similarTempTask2(startingYear, timePeriod, selectedRegion, region, mode, mostSimilar);
             break;
         case 2:
             if (region == 1){
-                result = similarPopulationTask2(startingYear, timePeriod, selectedRegion, mode);
+                result = similarPopulationTask2(startingYear, timePeriod, selectedRegion, mode, mostSimilar);
                 break;
             }
             else{
@@ -832,21 +806,25 @@ public ArrayList<SubTaskB> subTaskBTask2 (int startingYear, int timePeriod, Stri
             }
         case 3:
             if (region == 1){
-                result = similarTempAndPopulationTask2(startingYear, timePeriod, selectedRegion, mode);
+                result = similarTempAndPopulationTask2(startingYear, timePeriod, selectedRegion, mode, mostSimilar);
                 break;
             }
             else{
                 break;
             }
     }
-    SortHighToLow(result);
-    
-    Reverse(result);
 
+    if(mostSimilar){
+        SortLowToHigh(result);
+    }
+    else{
+        SortHighToLow(result);
+    }
+    
     return result;
 }
 
-public static ArrayList<SubTaskB> similarTempTask2 (int startingYear, int timePeriod, String selectedRegion, int region, int mode){
+    public static ArrayList<SubTaskB> similarTempTask2 (int startingYear, int timePeriod, String selectedRegion, int region, int mode, boolean mostSimilar){
     ArrayList<SubTaskB> result = new ArrayList<>();
         
         Connection connection = null;
@@ -940,7 +918,7 @@ public static ArrayList<SubTaskB> similarTempTask2 (int startingYear, int timePe
 
             statement.close();
 
-            //Retrieve a list of all other regions besides the selected one
+            //Retrieve a list of all regions
             switch(region){
                 case 1:
                     query = "SELECT DISTINCT Country FROM GlobalYearlyLandTempByCountry";
@@ -1003,21 +981,31 @@ public static ArrayList<SubTaskB> similarTempTask2 (int startingYear, int timePe
                     preparedStatement.setInt(2, i);
                     preparedStatement.setInt(3, i + timePeriod - 1);
                     results = preparedStatement.executeQuery();
+
+
                     while (results.next()) {
                         average = results.getDouble("Avg");
                     }
+
+                    // Absolute or relative
                     if (mode == 1){
                         similarRate = Math.abs(average - avg) ;
                     }
                     else{
                         similarRate = Math.abs((average - avg) / avg) * 100;
                     }
+
                     SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, average, 0, similarRate, currentRegion, region);
                     avgTemp.add(temp);
                     statement.close();
                 }
 
-                SortLowToHigh(avgTemp);
+                if(mostSimilar){
+                    SortLowToHigh(avgTemp);
+                }
+                else{
+                    SortHighToLow(avgTemp);
+                }
                 result.add(avgTemp.get(0));
             }
 
@@ -1038,7 +1026,7 @@ public static ArrayList<SubTaskB> similarTempTask2 (int startingYear, int timePe
     return result;
 }
 
-public static ArrayList<SubTaskB> similarPopulationTask2 (int startingYear, int timePeriod, String selectedRegion, int mode){
+    public static ArrayList<SubTaskB> similarPopulationTask2 (int startingYear, int timePeriod, String selectedRegion, int mode, boolean mostSimilar){
     ArrayList<SubTaskB> result = new ArrayList<>();
         
         Connection connection = null;
@@ -1116,6 +1104,9 @@ public static ArrayList<SubTaskB> similarPopulationTask2 (int startingYear, int 
                 //Find average population of the selected region in various time period and then get the highest similar rate
                 for(int i = beginYear; i <= endYear - (timePeriod - 1); i++){
                     average = 0;
+
+                    long startTime2 = System.currentTimeMillis();
+
                     query = "SELECT AVG(Population) AS Avg FROM Population WHERE Country_Name = ? AND (Year BETWEEN ? AND ?)";
 
                     preparedStatement = connection.prepareStatement(query);
@@ -1124,15 +1115,24 @@ public static ArrayList<SubTaskB> similarPopulationTask2 (int startingYear, int 
                     preparedStatement.setInt(3, i + timePeriod - 1);
                     results = preparedStatement.executeQuery();
 
+                    long endTime2 = System.currentTimeMillis();
+
+                    long executionTime2 = endTime2 - startTime2;
+
+                    System.out.println("Second task Execution Time: " + executionTime2 + " milliseconds");
+
                     while (results.next()) {
                         average = results.getDouble("Avg");
                     }
+
+                    // Absolute or relative
                     if (mode == 1){
                         similarRate = Math.abs(average - avg) ;
                     }
                     else{
                         similarRate = Math.abs((average - avg) / avg) * 100;
                     }
+
                     SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, 0, (int) average, similarRate, currentRegion, 1);
                     avgTemp.add(temp);
                     statement.close();
@@ -1144,7 +1144,13 @@ public static ArrayList<SubTaskB> similarPopulationTask2 (int startingYear, int 
                 System.out.println(x + " " + executionTime + " milliseconds");
 
 
-                SortLowToHigh(avgTemp);
+                if(mostSimilar){
+                    SortLowToHigh(avgTemp);
+                }
+                else{
+                    SortHighToLow(avgTemp);
+                }
+
                 result.add(avgTemp.get(0));
             }
 
@@ -1165,7 +1171,7 @@ public static ArrayList<SubTaskB> similarPopulationTask2 (int startingYear, int 
     return result;
 }
 
-public static ArrayList<SubTaskB> similarTempAndPopulationTask2 (int startingYear, int timePeriod, String selectedRegion, int mode){
+    public static ArrayList<SubTaskB> similarTempAndPopulationTask2 (int startingYear, int timePeriod, String selectedRegion, int mode, boolean mostSimilar){
     ArrayList<SubTaskB> result = new ArrayList<>();
         
         Connection connection = null;
@@ -1175,8 +1181,6 @@ public static ArrayList<SubTaskB> similarTempAndPopulationTask2 (int startingYea
 
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);
-
-            long startTime = System.currentTimeMillis();
 
             //Check if the region exists
             String query = "SELECT EXISTS (SELECT 1 FROM GlobalYearlyLandTempByCountry AS Temperature JOIN Population ON Temperature.Country = Population.Country_Name WHERE Temperature.Country = ? AND (Population.Year BETWEEN ? AND ?))";
@@ -1194,13 +1198,7 @@ public static ArrayList<SubTaskB> similarTempAndPopulationTask2 (int startingYea
             
             preparedStatement.close();
 
-            long endTime = System.currentTimeMillis();
-            long executionTime = endTime - startTime;
-            System.out.println("First task Execution Time: " + executionTime + " milliseconds");
-
             //Find available first and last year
-
-            startTime = System.currentTimeMillis();
 
             query = "SELECT MIN(Year) AS Min, MAX(Year) AS Max FROM Population WHERE Country_Name = ?";
             int beginYear = 0;
@@ -1216,42 +1214,41 @@ public static ArrayList<SubTaskB> similarTempAndPopulationTask2 (int startingYea
             }
             preparedStatement.close();
 
-            endTime = System.currentTimeMillis();
-            executionTime = endTime - startTime;
-            System.out.println("Second task Execution Time: " + executionTime + " milliseconds");
+            // Prepare and execute the first query
+            String query1 = "SELECT AVG(Population.Population) AS AvgPopulation " +
+            "FROM Population " +
+            "WHERE Population.Country_Name = ? AND (Population.Year BETWEEN ? AND ?)";
 
-            //Find average population and temperature of the selected region in a certain time period
-
-            startTime = System.currentTimeMillis();
-
-            query = "SELECT AVG(Population.Population) AS AvgPopulation, AVG(Temperature.AverageTemperature) AS AvgTemp " +
-               "FROM Population " +
-               "JOIN GlobalYearlyLandTempByCountry AS Temperature ON Population.Country_Name = Temperature.Country " +
-               "WHERE Population.Country_Name = ? AND (Population.Year BETWEEN ? AND ?)";
-
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, selectedRegion);
-            preparedStatement.setInt(2, startingYear);
-            preparedStatement.setInt(3, startingYear + timePeriod - 1);
-            results = preparedStatement.executeQuery();
+            PreparedStatement preparedStatement1 = connection.prepareStatement(query1);
+            preparedStatement1.setString(1, selectedRegion);
+            preparedStatement1.setInt(2, startingYear);
+            preparedStatement1.setInt(3, startingYear + timePeriod - 1);
+            ResultSet results1 = preparedStatement1.executeQuery();
 
             double avgPopulation = 0;
-            double avgTemp = 0;
-
-            while (results.next()) {
-                avgPopulation = results.getDouble("AvgPopulation");
-                avgTemp = results.getDouble("AvgTemp");
+            if (results1.next()) {
+            avgPopulation = results1.getDouble("AvgPopulation");
             }
+            preparedStatement1.close();
 
-            preparedStatement.close();
+            // Prepare and execute the second query
+            String query2 = "SELECT AVG(Temp.AverageTemperature) AS AvgTemp " +
+            "FROM GlobalYearlyLandTempByCountry AS Temp " +
+            "WHERE Temp.Country = ? AND (Temp.Year BETWEEN ? AND ?)";
 
-            endTime = System.currentTimeMillis();
-            executionTime = endTime - startTime;
-            System.out.println("Third task Execution Time: " + executionTime + " milliseconds");
+            PreparedStatement preparedStatement2 = connection.prepareStatement(query2);
+            preparedStatement2.setString(1, selectedRegion);
+            preparedStatement2.setInt(2, startingYear);
+            preparedStatement2.setInt(3, startingYear + timePeriod - 1);
+            ResultSet results2 = preparedStatement2.executeQuery();
+
+            double avgTemp = 0;
+            if (results2.next()) {
+            avgTemp = results2.getDouble("AvgTemp");
+            }
+            preparedStatement2.close();
 
             //Retrieve a list of all other regions besides the selected one
-            
-            startTime = System.currentTimeMillis();
 
             query = "SELECT DISTINCT Population.Country_Name AS Country " +
                "FROM Population " +
@@ -1267,31 +1264,29 @@ public static ArrayList<SubTaskB> similarTempAndPopulationTask2 (int startingYea
 
             preparedStatement.close();
 
-            endTime = System.currentTimeMillis();
-            executionTime = endTime - startTime;
-            System.out.println("Fourth task Execution Time: " + executionTime + " milliseconds");
+            //Going through every region and find the average temperature and population in a certain time period
 
-            //Going through every region and find the average temperature in a certain time period
-
-            query = "SELECT AVG(Population.Population) AS AvgPopulation, AVG(Temperature.AverageTemperature) AS AvgTemp " +
+            query1 = "SELECT AVG(Population.Population) AS AvgPopulation " +
                                 "FROM Population " +
-                                "JOIN GlobalYearlyLandTempByCountry AS Temperature ON Population.Country_Name = Temperature.Country " +
                                 "WHERE Population.Country_Name = ? AND (Population.Year BETWEEN ? AND ?)";
 
-                preparedStatement = connection.prepareStatement(query);
+
+            query2 = "SELECT AVG(Temp.AverageTemperature) AS AvgTemp " +
+                                "FROM GlobalYearlyLandTempByCountry AS Temp " +
+                                "WHERE Temp.Country = ? AND (Temp.Year BETWEEN ? AND ?)";
+                        
+            preparedStatement1 = connection.prepareStatement(query1);
+            preparedStatement2 = connection.prepareStatement(query2);
             
             for(int x = 0; x < data.size(); x++){
                 String currentRegion = data.get(x);
+                ArrayList<SubTaskB> tempList = new ArrayList<>();
                 double averageTemp = 0;
                 double averagePopulation = 0;
-                double similarScore = 0;
-                double minSimilarScore = Double.MAX_VALUE;;
+                double differenceScore = 0;
 
-                SubTaskB temp = null;
-
-                preparedStatement.setString(1, currentRegion);
-
-                startTime = System.currentTimeMillis();
+                preparedStatement1.setString(1, currentRegion);
+                preparedStatement2.setString(1, currentRegion);
 
                 //Find average population and temperature of the selected region in various time period and then get the highest similar rate
                 for(int i = beginYear; i <= endYear - (timePeriod - 1); i++){
@@ -1299,39 +1294,50 @@ public static ArrayList<SubTaskB> similarTempAndPopulationTask2 (int startingYea
                     averageTemp = 0;
                     averagePopulation = 0;
 
-                    preparedStatement.setInt(2, i);
-                    preparedStatement.setInt(3, i + timePeriod - 1);
+                    preparedStatement1.setInt(2, i);
+                    preparedStatement1.setInt(3, i + timePeriod - 1);
 
-                    results = preparedStatement.executeQuery();
+                    preparedStatement2.setInt(2, i);
+                    preparedStatement2.setInt(3, i + timePeriod - 1);
 
-                    if (results.next()) {
-                        averagePopulation = results.getDouble("AvgPopulation");
-                        averageTemp = results.getDouble("AvgTemp");
+                    results1 = preparedStatement1.executeQuery();
+
+
+                    if (results1.next()) {
+                        averagePopulation = results1.getDouble("AvgPopulation");
+                    }
+
+                    results2 = preparedStatement2.executeQuery();
+
+                    if (results2.next()) {
+                        averageTemp = results2.getDouble("AvgTemp");
                     }
                     
                     if (mode == 1){
-                        similarScore = Math.sqrt((averageTemp - avgTemp) * (averageTemp - avgTemp) + (averagePopulation - avgPopulation) * (averagePopulation - avgPopulation));
+                        differenceScore = Math.sqrt((averageTemp - avgTemp) * (averageTemp - avgTemp) + (averagePopulation - avgPopulation) * (averagePopulation - avgPopulation));
                     }
                     else {
-                        similarScore = Math.sqrt(Math.pow(((averageTemp - avgTemp) / avgTemp) * 100, 2) + Math.pow(((averagePopulation - avgPopulation) / avgPopulation) * 100, 2));
+                        differenceScore = Math.sqrt(Math.pow(((averageTemp - avgTemp) / avgTemp) * 100, 2) + Math.pow(((averagePopulation - avgPopulation) / avgPopulation) * 100, 2));
                     }
-                 
-                    if(minSimilarScore > similarScore){
-                        minSimilarScore = similarScore;
-                        temp = new SubTaskB(i, i + timePeriod - 1, averageTemp, (int) averagePopulation, similarScore, currentRegion, 1);
-                    }
-                    
+
+                    SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, averageTemp, (int) averagePopulation, differenceScore, currentRegion, 1);
+                    tempList.add(temp);
+
                 }
 
-                endTime = System.currentTimeMillis();
-                executionTime = endTime - startTime;
-                System.out.println(x + " " + executionTime + " milliseconds");
+                if(mostSimilar){
+                    SortLowToHigh(tempList);
+                }
+                else{
+                    SortHighToLow(tempList);
+                }
 
-                result.add(temp);
+                result.add(tempList.get(0));
             }
 
 
-            preparedStatement.close();
+            preparedStatement1.close();
+            preparedStatement2.close();
 
 
         } catch (SQLException e) {
@@ -1349,5 +1355,37 @@ public static ArrayList<SubTaskB> similarTempAndPopulationTask2 (int startingYea
 
     return result;
 }
+
+    public static ArrayList<SubTaskB> SortHighToLow (ArrayList<SubTaskB> data){
+    
+    Collections.sort(data, new Comparator<SubTaskB>() {
+        @Override
+        public int compare(SubTaskB o1, SubTaskB o2) {
+            return Double.compare(o2.getDifferenceScore(), o1.getDifferenceScore());
+        }
+    });
+
+    return data;
+}
+
+    public static ArrayList<SubTaskB> SortLowToHigh (ArrayList<SubTaskB> data){
+    
+    Collections.sort(data, new Comparator<SubTaskB>() {
+        @Override
+        public int compare(SubTaskB o1, SubTaskB o2) {
+            return Double.compare(o1.getDifferenceScore(), o2.getDifferenceScore());
+        }
+    });
+
+    return data;
+}
+
+    public static ArrayList<SubTaskB> Reverse (ArrayList<SubTaskB> data){
+    
+    Collections.reverse(data);
+
+    return data;
+}
+
 
 }
