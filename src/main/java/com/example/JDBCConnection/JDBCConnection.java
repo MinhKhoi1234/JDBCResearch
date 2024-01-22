@@ -787,18 +787,18 @@ public class JDBCConnection {
         return result;
     }
 
-    public ArrayList<SubTaskB> subTaskBTask2 (int startingYear, int timePeriod, String selectedRegion, int region, int option, int mode, boolean mostSimilar){
+    public ArrayList<SubTaskB> subTaskBTask2 (int startingYear, int timePeriod, String selectedRegion, int region, int option, int mode, boolean mostSimilar, boolean omit){
     // region 1  = country, 2 = state, 3 = city
     // option 1 = temperature, 2 = population, 3 = both
     // mode 1 = absolute, 2 = relative
     ArrayList<SubTaskB> result = new ArrayList<SubTaskB>();
     switch(option){
         case 1:
-            result = similarTempTask2(startingYear, timePeriod, selectedRegion, region, mode, mostSimilar);
+            result = similarTempTask2(startingYear, timePeriod, selectedRegion, region, mode, mostSimilar, omit);
             break;
         case 2:
             if (region == 1){
-                result = similarPopulationTask2(startingYear, timePeriod, selectedRegion, mode, mostSimilar);
+                result = similarPopulationTask2(startingYear, timePeriod, selectedRegion, mode, mostSimilar, omit);
                 break;
             }
             else{
@@ -806,7 +806,7 @@ public class JDBCConnection {
             }
         case 3:
             if (region == 1){
-                result = similarTempAndPopulationTask2(startingYear, timePeriod, selectedRegion, mode, mostSimilar);
+                result = similarTempAndPopulationTask2(startingYear, timePeriod, selectedRegion, mode, mostSimilar, omit);
                 break;
             }
             else{
@@ -824,7 +824,7 @@ public class JDBCConnection {
     return result;
 }
 
-    public static ArrayList<SubTaskB> similarTempTask2 (int startingYear, int timePeriod, String selectedRegion, int region, int mode, boolean mostSimilar){
+    public static ArrayList<SubTaskB> similarTempTask2 (int startingYear, int timePeriod, String selectedRegion, int region, int mode, boolean mostSimilar, boolean omit){
     ArrayList<SubTaskB> result = new ArrayList<>();
         
         Connection connection = null;
@@ -1006,7 +1006,11 @@ public class JDBCConnection {
                 else{
                     SortHighToLow(avgTemp);
                 }
+                if(omit){
                 result.add(avgTemp.get(0));
+                } else {
+                    result.addAll(avgTemp);
+                }
             }
 
 
@@ -1026,7 +1030,7 @@ public class JDBCConnection {
     return result;
 }
 
-    public static ArrayList<SubTaskB> similarPopulationTask2 (int startingYear, int timePeriod, String selectedRegion, int mode, boolean mostSimilar){
+    public static ArrayList<SubTaskB> similarPopulationTask2 (int startingYear, int timePeriod, String selectedRegion, int mode, boolean mostSimilar, boolean omit){
     ArrayList<SubTaskB> result = new ArrayList<>();
         
         Connection connection = null;
@@ -1151,7 +1155,11 @@ public class JDBCConnection {
                     SortHighToLow(avgTemp);
                 }
 
-                result.add(avgTemp.get(0));
+                if(omit){
+                    result.add(avgTemp.get(0));
+                } else {
+                    result.addAll(avgTemp);
+                }
             }
 
 
@@ -1171,7 +1179,7 @@ public class JDBCConnection {
     return result;
 }
 
-    public static ArrayList<SubTaskB> similarTempAndPopulationTask2 (int startingYear, int timePeriod, String selectedRegion, int mode, boolean mostSimilar){
+    public static ArrayList<SubTaskB> similarTempAndPopulationTask2 (int startingYear, int timePeriod, String selectedRegion, int mode, boolean mostSimilar, boolean omit){
     ArrayList<SubTaskB> result = new ArrayList<>();
         
         Connection connection = null;
@@ -1332,7 +1340,11 @@ public class JDBCConnection {
                     SortHighToLow(tempList);
                 }
 
-                result.add(tempList.get(0));
+                if(omit){
+                    result.add(tempList.get(0));
+                } else {
+                    result.addAll(tempList);
+                }
             }
 
 
