@@ -1103,13 +1103,10 @@ public class JDBCConnection {
                 double similarRate;
                 String currentRegion = data.get(x);
 
-                long startTime = System.currentTimeMillis();
-
                 //Find average population of the selected region in various time period and then get the highest similar rate
                 for(int i = beginYear; i <= endYear - (timePeriod - 1); i++){
                     average = 0;
 
-                    long startTime2 = System.currentTimeMillis();
 
                     query = "SELECT AVG(Population) AS Avg FROM Population WHERE Country_Name = ? AND (Year BETWEEN ? AND ?)";
 
@@ -1118,12 +1115,6 @@ public class JDBCConnection {
                     preparedStatement.setInt(2, i);
                     preparedStatement.setInt(3, i + timePeriod - 1);
                     results = preparedStatement.executeQuery();
-
-                    long endTime2 = System.currentTimeMillis();
-
-                    long executionTime2 = endTime2 - startTime2;
-
-                    System.out.println("Second task Execution Time: " + executionTime2 + " milliseconds");
 
                     while (results.next()) {
                         average = results.getDouble("Avg");
@@ -1142,11 +1133,6 @@ public class JDBCConnection {
                     statement.close();
 
                 }
-
-                long endTime = System.currentTimeMillis();
-                long executionTime = endTime - startTime;
-                System.out.println(x + " " + executionTime + " milliseconds");
-
 
                 if(mostSimilar){
                     SortLowToHigh(avgTemp);
