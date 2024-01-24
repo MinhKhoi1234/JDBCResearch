@@ -1,6 +1,7 @@
 package com.example;
 
 import com.example.JDBCConnection.JDBCConnection;
+import com.example.model.SubTaskA;
 import com.example.model.SubTaskB;
 
 import java.nio.charset.StandardCharsets;
@@ -17,8 +18,7 @@ public class Main {
         // System.out.println(jdbcConnection.getCityAndTemp("Vietnam", "City", 1990, 2000).get(2).getAvgTemp());
         //Write the system.out.print to test here
 
-        long startTime = System.currentTimeMillis();
-
+        /** 
         // Task 2
 
         // region 1  = country, 2 = state, 3 = city
@@ -26,8 +26,12 @@ public class Main {
         // mode 1 = absolute, 2 = relative
         // mostSimilar true -> most similar, false -> least similar
         // omit true -> only take one time period of all regions into account, false -> take all time period of all regions into account
+
+        long startTime = System.currentTimeMillis();
+
+
         ArrayList<SubTaskB> test = new ArrayList<SubTaskB>();
-        test = jdbcConnection.subTaskBTask2(1990, 10, "Vietnam", 1, 1, 1, true, true);
+        test = jdbcConnection.subTaskBTask2(1990, 10, "Vietnam", 1, 1, 2, true, false);
         if (!test.isEmpty()) {
             for(int i = 0; i < 10; i++){
                 System.out.println(test.get(i).toString());
@@ -40,6 +44,7 @@ public class Main {
         long executionTime = endTime - startTime;
         System.out.println("Execution Time: " + executionTime + " milliseconds");
         
+        */
 
         /*
         // Task 1
@@ -64,5 +69,22 @@ public class Main {
         long executionTime = endTime - startTime;
         System.out.println("Execution Time: " + executionTime + " milliseconds");
         */
+
+        // Sub Task A
+
+        long startTime = System.currentTimeMillis();
+
+        // region 1  = country, 2 = state, 3 = city
+        SubTaskA test = new SubTaskA();
+        test = jdbcConnection.differenceInAverage(1990, 10, "Vietnam", 1);
+        if (test != null) {
+            System.out.println(test.toString());
+        } else {
+            System.out.println("The list is empty");
+        }
+
+        long endTime = System.currentTimeMillis();
+        long executionTime = endTime - startTime;
+        System.out.println("Execution Time: " + executionTime + " milliseconds");
     }
 }

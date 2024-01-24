@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import com.example.model.Input;
+import com.example.model.SubTaskA;
 import com.example.model.SubTaskB;
 import com.mysql.cj.x.protobuf.MysqlxDatatypes.Array;
 
@@ -1385,5 +1386,147 @@ public class JDBCConnection {
     return data;
 }
 
+    public SubTaskA differenceInAverage (int startingYear, int timePeriod, String selectedRegion, int region){
+        SubTaskA result = null;
+        
+        Connection connection = null;
+        
+        try{
+            connection = DriverManager.getConnection(DATABASE3);
 
+            Statement statement = connection.createStatement();
+            statement.setQueryTimeout(30);
+
+            //Check if the country exists
+            String query = "SELECT EXISTS (SELECT 1 FROM ";
+
+            switch(region){
+                case 1:
+                    query += "GlobalYearlyLandTempByCountry WHERE Country = ? AND Year BETWEEN ? AND ?)";
+                    break;
+                case 2:
+                    query += "GlobalYearlyLandTempByState WHERE State = ? AND Year BETWEEN ? AND ?)";
+                    break;
+                case 3:
+                    query += "GlobalYearlyLandTempByCity WHERE City = ? AND Year BETWEEN ? AND ?)";
+                    break;
+            }
+
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, selectedRegion);
+            preparedStatement.setInt(2, startingYear);
+            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next() && !resultSet.getBoolean(1)) {
+                System.out.println("Does not exist\n");
+                System.out.println(selectedRegion);
+                return result;
+            }
+
+            preparedStatement.close();
+
+            //Find average temperature of the selected region in a certain time period
+            query = "SELECT AVG(AverageTemperature) AS Avg FROM ";
+
+            switch(region){
+                case 1:
+                    query += "GlobalYearlyLandTempByCountry WHERE Country = ? AND Year BETWEEN ? AND ?";
+                    break;
+                case 2:
+                    query += "GlobalYearlyLandTempByState WHERE State = ? AND Year BETWEEN ? AND ?";
+                    break;
+                case 3:
+                    query += "GlobalYearlyLandTempByCity WHERE City = ? AND Year BETWEEN ? AND ?";
+                    break;
+            }
+
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, selectedRegion);
+            preparedStatement.setInt(2, startingYear);
+            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+
+            resultSet = preparedStatement.executeQuery();
+            double avg = 0;
+            while (resultSet.next()) {
+                avg = resultSet.getDouble("Avg");
+            }
+
+            preparedStatement.close();
+
+            //Find difference in temperature of the selected region
+            query = "SELECT MinimumTemperature AS Min, MaximumTemperature AS Max FROM ";
+            switch(region){
+                case 1:
+                    query += "GlobalYearlyLandTempByCountry WHERE Country = ? AND Year BETWEEN ? AND ?";
+                    break;
+                case 2:
+                    query += "GlobalYearlyLandTempByState WHERE State = ? AND Year BETWEEN ? AND ?";
+                    break;
+                case 3:
+                    query += "GlobalYearlyLandTempByCity WHERE City = ? AND Year BETWEEN ? AND ?";
+                    break;
+            }
+
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, selectedRegion);
+            preparedStatement.setInt(2, startingYear);
+            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            
+            resultSet = preparedStatement.executeQuery();
+            double min = 0;
+            double max = 0;
+            double minTotal = 0;
+            double maxTotal = 0;
+            while (resultSet.next()) {
+                min = resultSet.getDouble("Min");
+                max = resultSet.getDouble("Max");
+                minTotal += min;
+                maxTotal += max;
+            }
+            double averageTempDifference = Math.abs((maxTotal - minTotal) / 2);
+
+            preparedStatement.close();
+
+            result = new SubTaskA(startingYear, startingYear + timePeriod - 1, avg, averageTempDifference, selectedRegion, region);
+
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+
+        
+        return result;
+    }
+
+    public static ArrayList<SubTaskA> TaskASortLowToHigh (ArrayList<SubTaskA> data){
+    
+        Collections.sort(data, new Comparator<SubTaskA>() {
+            @Override
+            public int compare(SubTaskA o1, SubTaskA o2) {
+                return Double.compare(o1.getAverageTempDifference(), o2.getAverageTempDifference());
+            }
+        });
+    
+        return data;
+    }
+
+    public static ArrayList<SubTaskA> TaskASortHighToLow (ArrayList<SubTaskA> data){
+    
+        Collections.sort(data, new Comparator<SubTaskA>() {
+            @Override
+            public int compare(SubTaskA o1, SubTaskA o2) {
+                return Double.compare(o2.getAverageTempDifference(), o1.getAverageTempDifference());
+            }
+        });
+    
+        return data;
+    }
 }
