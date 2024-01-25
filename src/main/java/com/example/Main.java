@@ -69,16 +69,22 @@ public class Main {
         long executionTime = endTime - startTime;
         System.out.println("Execution Time: " + executionTime + " milliseconds");
         */
-
+        
         // Sub Task A
 
         long startTime = System.currentTimeMillis();
 
         // region 1  = country, 2 = state, 3 = city
-        SubTaskA test = new SubTaskA();
-        test = jdbcConnection.differenceInAverage(1990, 10, "Vietnam", 1);
-        if (test != null) {
-            System.out.println(test.toString());
+        int[] startingYears = {1985, 1990, 1995, 2000};
+        String[] country = {"Vietnam", "Thailand", "Singapore", "Malaysia"};
+
+
+        ArrayList<SubTaskA> test = null;
+        test = jdbcConnection.SubTaskATask4(startingYears, 10, country, 1);
+        if (!test.isEmpty()) {
+            for(int i = 0; i < test.size(); i++){
+                System.out.println(test.get(i).toString());
+            }
         } else {
             System.out.println("The list is empty");
         }
@@ -86,5 +92,8 @@ public class Main {
         long endTime = System.currentTimeMillis();
         long executionTime = endTime - startTime;
         System.out.println("Execution Time: " + executionTime + " milliseconds");
+        
+        test = jdbcConnection.TaskASortHighToLowATD(test);
+        test = jdbcConnection.TaskASortHighToLowATD(test);
     }
 }
