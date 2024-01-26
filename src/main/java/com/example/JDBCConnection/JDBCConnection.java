@@ -1538,13 +1538,111 @@ public class JDBCConnection {
 
 
     // Subtask A
-    public ArrayList<SubTaskA> SubTaskATask2 (int startingYear, int timePeriod, String selectedRegion, int region){
-        ArrayList<SubTaskA> result = new ArrayList<SubTaskA>();
+    public double SubTaskATask2 (int startingYear, int timePeriod, String selectedRegion, int region){
+        double averageTemp = 0;
+        
+        Connection connection = null;
 
-        SubTaskA temp = differenceInAverage(startingYear, timePeriod, selectedRegion, region);
-        result.add(temp);
+        if (timePeriod == 0){
+            System.out.println("Invalid time period");
+            return averageTemp;
+        }
+        
+        try{
+            connection = DriverManager.getConnection(DATABASE3);
 
-        return result;
+            Statement statement = connection.createStatement();
+            statement.setQueryTimeout(30);
+
+            //Check if the country exists
+            String query = "SELECT EXISTS (SELECT 1 FROM ";
+
+            switch(region){
+                case 0:
+                    query += "GlobalYearlyLandTemp WHERE Year BETWEEN ? AND ?)";
+                    break;
+                case 1:
+                    query += "GlobalYearlyLandTempByCountry WHERE Country = ? AND Year BETWEEN ? AND ?)";
+                    break;
+                case 2:
+                    query += "GlobalYearlyLandTempByState WHERE State = ? AND Year BETWEEN ? AND ?)";
+                    break;
+                case 3:
+                    query += "GlobalYearlyLandTempByCity WHERE City = ? AND Year BETWEEN ? AND ?)";
+                    break;
+            }  
+
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            if(region != 0){
+                preparedStatement.setString(1, selectedRegion);
+                preparedStatement.setInt(2, startingYear);
+                preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            } else {
+                preparedStatement.setInt(1, startingYear);
+                preparedStatement.setInt(2, startingYear + timePeriod - 1);
+            }
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next() && !resultSet.getBoolean(1)) {
+                System.out.println("Does not exist\n");
+                System.out.println(selectedRegion);
+                return averageTemp;
+            }
+
+            preparedStatement.close();
+
+            //Find average temperature of the selected region in a certain time period
+            query = "SELECT AVG(AverageTemperature) AS Avg FROM ";
+
+            switch(region){
+                case 0:
+                    query += "GlobalYearlyLandTemp WHERE Year BETWEEN ? AND ?";
+                    break;
+                case 1:
+                    query += "GlobalYearlyLandTempByCountry WHERE Country = ? AND Year BETWEEN ? AND ?";
+                    break;
+                case 2:
+                    query += "GlobalYearlyLandTempByState WHERE State = ? AND Year BETWEEN ? AND ?";
+                    break;
+                case 3:
+                    query += "GlobalYearlyLandTempByCity WHERE City = ? AND Year BETWEEN ? AND ?";
+                    break;
+            }
+
+            preparedStatement = connection.prepareStatement(query);
+
+            if(region != 0){
+                preparedStatement.setString(1, selectedRegion);
+                preparedStatement.setInt(2, startingYear);
+                preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            } else {
+                preparedStatement.setInt(1, startingYear);
+                preparedStatement.setInt(2, startingYear + timePeriod - 1);
+            }
+
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                averageTemp = resultSet.getDouble("Avg");
+            }
+
+            preparedStatement.close();
+
+            
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+
+        
+        return averageTemp;
     }
 
 
