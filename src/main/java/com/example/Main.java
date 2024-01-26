@@ -18,7 +18,7 @@ public class Main {
         // System.out.println(jdbcConnection.getCityAndTemp("Vietnam", "City", 1990, 2000).get(2).getAvgTemp());
         //Write the system.out.print to test here
 
-        
+        /*
         // Task 2
 
         // region 1  = country, 2 = state, 3 = city
@@ -44,6 +44,7 @@ public class Main {
         long executionTime = endTime - startTime;
         System.out.println("Execution Time: " + executionTime + " milliseconds");
         
+        */
         
 
         /*
@@ -70,7 +71,7 @@ public class Main {
         System.out.println("Execution Time: " + executionTime + " milliseconds");
         */
         
-        /*
+        
         // Sub Task A
 
         long startTime = System.currentTimeMillis();
@@ -81,7 +82,7 @@ public class Main {
 
 
         ArrayList<SubTaskA> test = null;
-        test = jdbcConnection.SubTaskATask4(startingYears, 10, country, 1);
+        test = jdbcConnection.SubTaskATask6(100000, 2000000, 2);
         if (!test.isEmpty()) {
             for(int i = 0; i < test.size(); i++){
                 System.out.println(test.get(i).toString());
@@ -96,6 +97,6 @@ public class Main {
         
         test = jdbcConnection.TaskASortHighToLowATD(test);
         test = jdbcConnection.TaskASortHighToLowATD(test);
-        */
+        
     }
 }

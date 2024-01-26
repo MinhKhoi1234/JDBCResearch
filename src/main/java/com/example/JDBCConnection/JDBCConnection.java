@@ -882,6 +882,7 @@ public class JDBCConnection {
             }
 
 
+
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         } finally {
@@ -1563,8 +1564,8 @@ public class JDBCConnection {
         return result;
     }
 
-    public ArrayList<String> SubTaskATask6 (double startValue, double endValue, int mode){
-        ArrayList<String> data = new ArrayList<>();
+    public ArrayList<SubTaskA> SubTaskATask6 (double startValue, double endValue, int mode){
+        ArrayList<SubTaskA> data = new ArrayList<>();
 
         Connection connection = null;
 
@@ -1577,10 +1578,10 @@ public class JDBCConnection {
             String query = "";
             switch(mode){
                 case 1:
-                    query = "SELECT DISTINCT Country FROM GlobalYearlyLandTempByCountry WHERE AverageTemperature BETWEEN ? AND ? AND YEAR = 2013";
+                    query = "SELECT DISTINCT Country, AverageTemperature AS Avg FROM GlobalYearlyLandTempByCountry WHERE AverageTemperature BETWEEN ? AND ? AND YEAR = 2013";
                     break;
                 case 2:
-                    query = "SELECT DISTINCT Country FROM Population WHERE Population BETWEEN ? AND ? AND YEAR = 2013";
+                    query = "SELECT DISTINCT Country_Name, Population FROM Population WHERE Population BETWEEN ? AND ? AND YEAR = 2013";
                     break;
             }    
 
@@ -1590,7 +1591,16 @@ public class JDBCConnection {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                data.add(resultSet.getString("Country"));
+                switch(mode){
+                    case 1:
+                        SubTaskA temp = new SubTaskA(resultSet.getDouble("Avg"), 0, resultSet.getString("Country"), 1);
+                        data.add(temp);
+                        break;
+                    case 2:
+                        SubTaskA temp2 = new SubTaskA(0, resultSet.getLong("Population"), resultSet.getString("Country_Name"), 1);
+                        data.add(temp2);
+                        break;
+                }
             }
             
         } catch (SQLException e) {

@@ -5,6 +5,7 @@ public class SubTaskA {
     private int endingYear;
     private int timePeriod;
     private double averageTemp;
+    private long averagePopulation;
     private double averageTempDifference;
     private String regionName;
     private int type;
@@ -20,6 +21,21 @@ public class SubTaskA {
         this.averageTempDifference = averageTempDifference;
         this.regionName = regionName;
         this.type = type;
+    }
+
+    public SubTaskA (double averageTemp, long averagePopulation, String regionName, int type){
+        this.averageTemp = averageTemp;
+        this.averagePopulation = averagePopulation;
+        this.regionName = regionName;
+        this.type = type;
+    }
+
+    public long getAveragePopulation() {
+        return averagePopulation;
+    }
+
+    public void setAveragePopulation(long averagePopulation) {
+        this.averagePopulation = averagePopulation;
     }
 
     public double getAverageTemp(){
@@ -85,7 +101,8 @@ public class SubTaskA {
                 "\nStarting year: " + startingYear + 
                 "\nEnding Year: " + endingYear + 
                 "\nTime Period: " + timePeriod +
+                "\nAverage Population: " + averagePopulation +
                 "\nAverage Temperature: " + averageTemp +
-                "\nAverage Temperature DIfference: " + averageTempDifference + "\n\n";
+                "\nAverage Temperature difference: " + averageTempDifference + "\n\n";
     }
 }
