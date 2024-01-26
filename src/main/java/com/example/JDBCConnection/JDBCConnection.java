@@ -443,7 +443,7 @@ public class JDBCConnection {
 
     // subTask B
 
-    public ArrayList<SubTaskB> subTaskBTask1(int startingYear, int timePeriod, String selectedRegion, int region, int option, int mode, boolean mostSimilar) {
+    public ArrayList<SubTaskB> subTaskBTask1(int startingYear, int timePeriod, String selectedRegion, int region, int option, int mode, boolean mostSimilar, int numResults) {
         // region 1  = country, 2 = state, 3 = city
         // option 1 = temperature, 2 = population, 3 = both
         // mode 1 = absolute, 2 = relative

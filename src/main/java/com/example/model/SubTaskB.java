@@ -8,15 +8,16 @@ public class SubTaskB {
     private int endingYear;
     private int timePeriod;
     private double temp;
-    private int population;
+    private long population;
     private double differenceScore;
     private String regionName;
     private int type;
+    private int numberOfSimResults;
 
     public SubTaskB(){
     }
 
-    public SubTaskB (int startingYear, int endingYear, int timePeriod, double avgTemp, int population, double differenceScore, String regionName, int type){
+    public SubTaskB (int startingYear, int endingYear, int timePeriod, double avgTemp, long population, double differenceScore, String regionName, int type){
         this.startingYear = startingYear;
         this.endingYear = endingYear;
         this.timePeriod = timePeriod;
@@ -25,6 +26,10 @@ public class SubTaskB {
         this.differenceScore = differenceScore;
         this.regionName = regionName;
         this.type = type;
+    }
+
+    public int getNumberOfSimResults() {
+        return numberOfSimResults;
     }
 
     public double getTemp(){
@@ -43,7 +48,7 @@ public class SubTaskB {
         return differenceScore;
     }
 
-    public int getPopulation(){
+    public long getPopulation(){
         return population;
     }
 
@@ -89,6 +94,10 @@ public class SubTaskB {
 
     public void setType(int type){
         this.type = type;
+    }
+
+    public void setNumberOfSimResults(int numberOfSimResults) {
+        this.numberOfSimResults = numberOfSimResults;
     }
 
     @Override
