@@ -629,7 +629,7 @@ public class JDBCConnection {
                 }
 
 
-                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, average, 0, similarRate, selectedRegion, region);
+                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, average, 0, similarRate, selectedRegion, region);
                 result.add(temp);
                 statement.close();
             }
@@ -746,7 +746,7 @@ public class JDBCConnection {
                 else{
                     similarRate = Math.abs((average - avg) / avg) * 100;
                 }
-                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, 0, (int) average, similarRate, selectedRegion, 1);
+                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, 0, (int) average, similarRate, selectedRegion, 1);
                 result.add(temp);
                 statement.close();
             }
@@ -877,7 +877,7 @@ public class JDBCConnection {
                 else{
                     similarRate = Math.sqrt(Math.pow(((averageTemp - avgTemp) / avgTemp) * 100, 2) + Math.pow(((averagePopulation - avgPopulation) / avgPopulation) * 100, 2));
                 }
-                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, averageTemp, (int) averagePopulation, similarRate, selectedRegion, 1);
+                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, averageTemp, (int) averagePopulation, similarRate, selectedRegion, 1);
                 result.add(temp);
             }
 
@@ -1105,7 +1105,7 @@ public class JDBCConnection {
                         similarRate = Math.abs((average - avg) / avg) * 100;
                     }
 
-                    SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, average, 0, similarRate, currentRegion, region);
+                    SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, average, 0, similarRate, currentRegion, region);
                     avgTemp.add(temp);
                     statement.close();
                 }
@@ -1246,7 +1246,7 @@ public class JDBCConnection {
                         similarRate = Math.abs((average - avg) / avg) * 100;
                     }
 
-                    SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, 0, (int) average, similarRate, currentRegion, 1);
+                    SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, 0, (int) average, similarRate, currentRegion, 1);
                     avgTemp.add(temp);
 
                     preparedStatement.close();
@@ -1433,7 +1433,7 @@ public class JDBCConnection {
                         differenceScore = Math.sqrt(Math.pow(((averageTemp - avgTemp) / avgTemp) * 100, 2) + Math.pow(((averagePopulation - avgPopulation) / avgPopulation) * 100, 2));
                     }
 
-                    SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, averageTemp, (int) averagePopulation, differenceScore, currentRegion, 1);
+                    SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, averageTemp, (int) averagePopulation, differenceScore, currentRegion, 1);
                     tempList.add(temp);
 
                 }
@@ -1742,7 +1742,7 @@ public class JDBCConnection {
 
             preparedStatement.close();
 
-            result = new SubTaskA(startingYear, startingYear + timePeriod - 1, avg, averageTempDifference, selectedRegion, region);
+            result = new SubTaskA(startingYear, startingYear + timePeriod - 1, timePeriod, avg, averageTempDifference, selectedRegion, region);
 
         } catch (SQLException e) {
             System.err.println(e.getMessage());

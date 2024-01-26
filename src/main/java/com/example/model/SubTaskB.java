@@ -6,6 +6,7 @@ public class SubTaskB {
     
     private int startingYear;
     private int endingYear;
+    private int timePeriod;
     private double temp;
     private int population;
     private double differenceScore;
@@ -15,9 +16,10 @@ public class SubTaskB {
     public SubTaskB(){
     }
 
-    public SubTaskB (int startingYear, int endingYear, double avgTemp, int population, double differenceScore, String regionName, int type){
+    public SubTaskB (int startingYear, int endingYear, int timePeriod, double avgTemp, int population, double differenceScore, String regionName, int type){
         this.startingYear = startingYear;
         this.endingYear = endingYear;
+        this.timePeriod = timePeriod;
         this.temp = avgTemp;
         this.population = population;
         this.differenceScore = differenceScore;
@@ -43,6 +45,14 @@ public class SubTaskB {
 
     public int getPopulation(){
         return population;
+    }
+
+    public int getTimePeriod() {
+        return timePeriod;
+    }
+
+    public void setTimePeriod(int timePeriod) {
+        this.timePeriod = timePeriod;
     }
 
     public String getRegionName(){
@@ -87,6 +97,7 @@ public class SubTaskB {
                 "\nType: " + type +
                 "\nStarting year: " + startingYear + 
                 "\nEnding Year: " + endingYear + 
+                "\nTime Period: " + timePeriod +
                 "\nAverageTemperature: " + temp + 
                 "\nAverage Population: " + population + 
                 "\nDifference Score: " + differenceScore + "\n\n";

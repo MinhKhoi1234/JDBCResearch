@@ -3,6 +3,7 @@ package com.example.model;
 public class SubTaskA {
     private int startingYear;
     private int endingYear;
+    private int timePeriod;
     private double averageTemp;
     private double averageTempDifference;
     private String regionName;
@@ -11,9 +12,10 @@ public class SubTaskA {
     public SubTaskA(){
     }
 
-    public SubTaskA (int startingYear, int endingYear, double averageTemp, double averageTempDifference, String regionName, int type){
+    public SubTaskA (int startingYear, int endingYear, int timePeriod, double averageTemp, double averageTempDifference, String regionName, int type){
         this.startingYear = startingYear;
         this.endingYear = endingYear;
+        this.timePeriod = timePeriod;
         this.averageTemp = averageTemp;
         this.averageTempDifference = averageTempDifference;
         this.regionName = regionName;
@@ -68,12 +70,21 @@ public class SubTaskA {
         this.type = type;
     }
 
+    public int getTimePeriod() {
+        return timePeriod;
+    }
+
+    public void setTimePeriod(int timePeriod) {
+        this.timePeriod = timePeriod;
+    }
+
     @Override
     public String toString() {
         return  "Region Name: " + regionName +
                 "\nType: " + type +
                 "\nStarting year: " + startingYear + 
                 "\nEnding Year: " + endingYear + 
+                "\nTime Period: " + timePeriod +
                 "\nAverage Temperature: " + averageTemp +
                 "\nAverage Temperature DIfference: " + averageTempDifference + "\n\n";
     }
