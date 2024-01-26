@@ -511,7 +511,7 @@ public class JDBCConnection {
             // Set the parameters and execute the query
             preparedStatement.setString(1, selectedRegion);
             preparedStatement.setInt(2, startingYear);
-            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            preparedStatement.setInt(3, startingYear + timePeriod);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next() && !resultSet.getBoolean(1)) {
@@ -576,7 +576,7 @@ public class JDBCConnection {
             // Set the parameters and execute the query
             preparedStatement.setString(1, selectedRegion);
             preparedStatement.setInt(2, startingYear);
-            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            preparedStatement.setInt(3, startingYear + timePeriod);
             results = preparedStatement.executeQuery();
 
             double avg = 0;
@@ -590,7 +590,7 @@ public class JDBCConnection {
             //Find average temperature of the selected region in various time period
             double average;
             double similarRate;
-            for(int i = beginYear; i <= endYear - (timePeriod - 1); i++){
+            for(int i = beginYear; i <= endYear - (timePeriod); i++){
                 average = 0;
                 query = "SELECT AVG(AverageTemperature) AS Avg ";
 
@@ -611,7 +611,7 @@ public class JDBCConnection {
                 // Set the parameters and execute the query
                 preparedStatement.setString(1, selectedRegion);
                 preparedStatement.setInt(2, i);
-                preparedStatement.setInt(3, i + timePeriod - 1);
+                preparedStatement.setInt(3, i + timePeriod);
                 results = preparedStatement.executeQuery();
 
                 while (results.next()) {
@@ -629,7 +629,7 @@ public class JDBCConnection {
                 }
 
 
-                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, average, 0, similarRate, selectedRegion, region);
+                SubTaskB temp = new SubTaskB(i, i + timePeriod, timePeriod, average, 0, similarRate, selectedRegion, region);
                 result.add(temp);
                 statement.close();
             }
@@ -668,7 +668,7 @@ public class JDBCConnection {
             // Set the parameters and execute the query
             preparedStatement.setString(1, selectedRegion);
             preparedStatement.setInt(2, startingYear);
-            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            preparedStatement.setInt(3, startingYear + timePeriod);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next() && !resultSet.getBoolean(1)) {
@@ -706,7 +706,7 @@ public class JDBCConnection {
             // Set the parameters and execute the query
             preparedStatement.setString(1, selectedRegion);
             preparedStatement.setInt(2, startingYear);
-            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            preparedStatement.setInt(3, startingYear + timePeriod);
             results = preparedStatement.executeQuery();
 
             double avg = 0;
@@ -721,7 +721,7 @@ public class JDBCConnection {
             //Find average population of the selected region in various time period
             double average;
             double similarRate;
-            for(int i = beginYear; i <= endYear - (timePeriod - 1); i++){
+            for(int i = beginYear; i <= endYear - timePeriod; i++){
                 average = 0;
 
                 query = "SELECT AVG(Population) AS Avg FROM Population WHERE Country_Name = ? AND (Year BETWEEN ? AND ?)";
@@ -729,7 +729,7 @@ public class JDBCConnection {
 
                 preparedStatement.setString(1, selectedRegion);
                 preparedStatement.setInt(2, i);
-                preparedStatement.setInt(3, i + timePeriod - 1);
+                preparedStatement.setInt(3, i + timePeriod);
                 results = preparedStatement.executeQuery();
 
                 while (results.next()) {
@@ -746,7 +746,7 @@ public class JDBCConnection {
                 else{
                     similarRate = Math.abs((average - avg) / avg) * 100;
                 }
-                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, 0, (long) average, similarRate, selectedRegion, 1);
+                SubTaskB temp = new SubTaskB(i, i + timePeriod, timePeriod, 0, (long) average, similarRate, selectedRegion, 1);
                 result.add(temp);
                 statement.close();
             }
@@ -778,10 +778,17 @@ public class JDBCConnection {
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);
 
-            //Check if the country exists
-            String query = "SELECT EXISTS (SELECT 1 FROM GlobalYearlyLandTempByCountry AS Temperature JOIN Population ON Temperature.Country = Population.Country_Name WHERE Temperature.Country = '" + selectedRegion + "'  AND (Population.Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "'))";
-            
-            ResultSet resultSet = statement.executeQuery(query);
+            // Check if the country exists
+            String query = "SELECT EXISTS (SELECT 1 FROM GlobalYearlyLandTempByCountry AS Temperature JOIN Population ON Temperature.Country = Population.Country_Name WHERE Temperature.Country = ? AND (Population.Year BETWEEN ? AND ?))";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            // Set the parameters
+            preparedStatement.setString(1, selectedRegion);
+            preparedStatement.setInt(2, startingYear);
+            preparedStatement.setInt(3, startingYear + timePeriod);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next() && !resultSet.getBoolean(1)) {
                 System.out.println("Does not exist\n");
                 return result;
@@ -789,7 +796,7 @@ public class JDBCConnection {
 
             // Prepare the SQL query
             query = "SELECT MIN(Year) AS Min, MAX(Year) AS Max FROM Population WHERE Country_Name = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement = connection.prepareStatement(query);
 
             // Set the parameters and execute the query
             preparedStatement.setString(1, selectedRegion);
@@ -812,7 +819,7 @@ public class JDBCConnection {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, selectedRegion);
             preparedStatement.setInt(2, startingYear);
-            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            preparedStatement.setInt(3, startingYear + timePeriod);
             results = preparedStatement.executeQuery();
             double avgPopulation = 0;
             while (results.next()) {
@@ -825,7 +832,7 @@ public class JDBCConnection {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, selectedRegion);
             preparedStatement.setInt(2, startingYear);
-            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            preparedStatement.setInt(3, startingYear + timePeriod);
             results = preparedStatement.executeQuery();
             double avgTemp = 0;
             while (results.next()) {
@@ -837,7 +844,7 @@ public class JDBCConnection {
             double averageTemp;
             double averagePopulation;
             double similarRate;
-            for(int i = beginYear; i <= endYear - (timePeriod - 1); i++){
+            for(int i = beginYear; i <= endYear - timePeriod; i++){
 
                 averageTemp = 0;
                 averagePopulation = 0;
@@ -852,7 +859,7 @@ public class JDBCConnection {
                 // Set the parameters and execute the queries
                 populationStatement.setString(1, selectedRegion);
                 populationStatement.setInt(2, i);
-                populationStatement.setInt(3, i + timePeriod - 1);
+                populationStatement.setInt(3, i + timePeriod);
                 results = populationStatement.executeQuery();
                 while (results.next()) {
                     averagePopulation = results.getDouble("Avg");
@@ -860,7 +867,7 @@ public class JDBCConnection {
 
                 temperatureStatement.setString(1, selectedRegion);
                 temperatureStatement.setInt(2, i);
-                temperatureStatement.setInt(3, i + timePeriod - 1);
+                temperatureStatement.setInt(3, i + timePeriod);
                 results = temperatureStatement.executeQuery();
                 while (results.next()) {
                     averageTemp = results.getDouble("Avg");
@@ -877,7 +884,7 @@ public class JDBCConnection {
                 else{
                     similarRate = Math.sqrt(Math.pow(((averageTemp - avgTemp) / avgTemp) * 100, 2) + Math.pow(((averagePopulation - avgPopulation) / avgPopulation) * 100, 2));
                 }
-                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, averageTemp, (long) averagePopulation, similarRate, selectedRegion, 1);
+                SubTaskB temp = new SubTaskB(i, i + timePeriod, timePeriod, averageTemp, (long) averagePopulation, similarRate, selectedRegion, 1);
                 result.add(temp);
             }
 
@@ -964,7 +971,7 @@ public class JDBCConnection {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, selectedRegion);
             preparedStatement.setInt(2, startingYear);
-            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            preparedStatement.setInt(3, startingYear + timePeriod);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next() && !resultSet.getBoolean(1)) {
                 System.out.println("Does not exist\n");
@@ -990,7 +997,7 @@ public class JDBCConnection {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, selectedRegion);
             preparedStatement.setInt(2, startingYear);
-            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            preparedStatement.setInt(3, startingYear + timePeriod);
             ResultSet results = preparedStatement.executeQuery();
 
             double avg = 0;
@@ -1070,7 +1077,7 @@ public class JDBCConnection {
                 preparedStatement.close();
 
                 //Find average temperature of the selected region in various time period and then get the highest similar rate
-                for(int i = beginYear; i <= endYear - (timePeriod - 1); i++){
+                for(int i = beginYear; i <= endYear - timePeriod; i++){
                     average = 0;
                     
                     query = "SELECT AVG(AverageTemperature) AS Avg FROM ";
@@ -1090,7 +1097,7 @@ public class JDBCConnection {
                     preparedStatement = connection.prepareStatement(query);
                     preparedStatement.setString(1, currentRegion);
                     preparedStatement.setInt(2, i);
-                    preparedStatement.setInt(3, i + timePeriod - 1);
+                    preparedStatement.setInt(3, i + timePeriod);
                     results = preparedStatement.executeQuery();
 
 
@@ -1106,7 +1113,7 @@ public class JDBCConnection {
                         similarRate = Math.abs((average - avg) / avg) * 100;
                     }
 
-                    SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, average, 0, similarRate, currentRegion, region);
+                    SubTaskB temp = new SubTaskB(i, i + timePeriod, timePeriod, average, 0, similarRate, currentRegion, region);
                     avgTemp.add(temp);
                     statement.close();
                 }
@@ -1157,7 +1164,7 @@ public class JDBCConnection {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, selectedRegion);
             preparedStatement.setInt(2, startingYear);
-            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            preparedStatement.setInt(3, startingYear + timePeriod);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next() && !resultSet.getBoolean(1)) {
@@ -1174,7 +1181,7 @@ public class JDBCConnection {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, selectedRegion);
             preparedStatement.setInt(2, startingYear);
-            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            preparedStatement.setInt(3, startingYear + timePeriod);
 
             ResultSet results = preparedStatement.executeQuery();
             double avg = 0;
@@ -1221,7 +1228,7 @@ public class JDBCConnection {
                 preparedStatement.close();
 
                 //Find average population of the selected region in various time period and then get the highest similar rate
-                for(int i = beginYear; i <= endYear - (timePeriod - 1); i++){
+                for(int i = beginYear; i <= endYear - timePeriod; i++){
                     average = 0;
 
 
@@ -1230,7 +1237,7 @@ public class JDBCConnection {
                     preparedStatement = connection.prepareStatement(query);
                     preparedStatement.setString(1, currentRegion);
                     preparedStatement.setInt(2, i);
-                    preparedStatement.setInt(3, i + timePeriod - 1);
+                    preparedStatement.setInt(3, i + timePeriod);
                     results = preparedStatement.executeQuery();
 
                     if(results.next()) {
@@ -1247,7 +1254,7 @@ public class JDBCConnection {
                         similarRate = Math.abs((average - avg) / avg) * 100;
                     }
 
-                    SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, 0, (long) average, similarRate, currentRegion, 1);
+                    SubTaskB temp = new SubTaskB(i, i + timePeriod, timePeriod, 0, (long) average, similarRate, currentRegion, 1);
                     avgTemp.add(temp);
 
                     preparedStatement.close();
@@ -1302,7 +1309,7 @@ public class JDBCConnection {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, selectedRegion);
             preparedStatement.setInt(2, startingYear);
-            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            preparedStatement.setInt(3, startingYear + timePeriod);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next() && !resultSet.getBoolean(1)) {
@@ -1320,7 +1327,7 @@ public class JDBCConnection {
             PreparedStatement preparedStatement1 = connection.prepareStatement(query1);
             preparedStatement1.setString(1, selectedRegion);
             preparedStatement1.setInt(2, startingYear);
-            preparedStatement1.setInt(3, startingYear + timePeriod - 1);
+            preparedStatement1.setInt(3, startingYear + timePeriod);
             ResultSet results1 = preparedStatement1.executeQuery();
 
             double avgPopulation = 0;
@@ -1337,7 +1344,7 @@ public class JDBCConnection {
             PreparedStatement preparedStatement2 = connection.prepareStatement(query2);
             preparedStatement2.setString(1, selectedRegion);
             preparedStatement2.setInt(2, startingYear);
-            preparedStatement2.setInt(3, startingYear + timePeriod - 1);
+            preparedStatement2.setInt(3, startingYear + timePeriod);
             ResultSet results2 = preparedStatement2.executeQuery();
 
             double avgTemp = 0;
@@ -1403,16 +1410,16 @@ public class JDBCConnection {
                 preparedStatement.close();
 
                 //Find average population and temperature of the selected region in various time period and then get the highest similar rate
-                for(int i = beginYear; i <= endYear - (timePeriod - 1); i++){
+                for(int i = beginYear; i <= endYear - timePeriod; i++){
                     
                     averageTemp = 0;
                     averagePopulation = 0;
 
                     preparedStatement1.setInt(2, i);
-                    preparedStatement1.setInt(3, i + timePeriod - 1);
+                    preparedStatement1.setInt(3, i + timePeriod);
 
                     preparedStatement2.setInt(2, i);
-                    preparedStatement2.setInt(3, i + timePeriod - 1);
+                    preparedStatement2.setInt(3, i + timePeriod);
 
                     results1 = preparedStatement1.executeQuery();
 
@@ -1434,7 +1441,7 @@ public class JDBCConnection {
                         differenceScore = Math.sqrt(Math.pow(((averageTemp - avgTemp) / avgTemp) * 100, 2) + Math.pow(((averagePopulation - avgPopulation) / avgPopulation) * 100, 2));
                     }
 
-                    SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, averageTemp, (long) averagePopulation, differenceScore, currentRegion, 1);
+                    SubTaskB temp = new SubTaskB(i, i + timePeriod, timePeriod, averageTemp, (long) averagePopulation, differenceScore, currentRegion, 1);
                     tempList.add(temp);
 
                 }
@@ -1577,10 +1584,10 @@ public class JDBCConnection {
             if(region != 0){
                 preparedStatement.setString(1, selectedRegion);
                 preparedStatement.setInt(2, startingYear);
-                preparedStatement.setInt(3, startingYear + timePeriod - 1);
+                preparedStatement.setInt(3, startingYear + timePeriod);
             } else {
                 preparedStatement.setInt(1, startingYear);
-                preparedStatement.setInt(2, startingYear + timePeriod - 1);
+                preparedStatement.setInt(2, startingYear + timePeriod);
             }
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -1615,10 +1622,10 @@ public class JDBCConnection {
             if(region != 0){
                 preparedStatement.setString(1, selectedRegion);
                 preparedStatement.setInt(2, startingYear);
-                preparedStatement.setInt(3, startingYear + timePeriod - 1);
+                preparedStatement.setInt(3, startingYear + timePeriod);
             } else {
                 preparedStatement.setInt(1, startingYear);
-                preparedStatement.setInt(2, startingYear + timePeriod - 1);
+                preparedStatement.setInt(2, startingYear + timePeriod);
             }
 
             resultSet = preparedStatement.executeQuery();
@@ -1646,7 +1653,20 @@ public class JDBCConnection {
     }
 
 
-    public ArrayList<SubTaskA> SubTaskATask4 (int[] startingYears, int timePeriod, String[] selectedRegions, int region){
+    public ArrayList<SubTaskA> SubTaskATask4NoFilter (int[] startingYears, int timePeriod, String[] selectedRegions, int region){
+        ArrayList<SubTaskA> result = new ArrayList<SubTaskA>();
+
+        for(String selectedRegion : selectedRegions){
+            for(int startingYear : startingYears){
+                SubTaskA temp = differenceInAverage(startingYear, timePeriod, selectedRegion, region);
+                result.add(temp);
+            }
+        }
+
+        return result;
+    }
+
+    public ArrayList<SubTaskA> SubTaskATask4WithFilter (int[] startingYears, int timePeriod, String[] selectedRegions, int region){
         ArrayList<SubTaskA> result = new ArrayList<SubTaskA>();
 
         for(String selectedRegion : selectedRegions){
@@ -1763,10 +1783,10 @@ public class JDBCConnection {
             if(region != 0){
                 preparedStatement.setString(1, selectedRegion);
                 preparedStatement.setInt(2, startingYear);
-                preparedStatement.setInt(3, startingYear + timePeriod - 1);
+                preparedStatement.setInt(3, startingYear + timePeriod);
             } else {
                 preparedStatement.setInt(1, startingYear);
-                preparedStatement.setInt(2, startingYear + timePeriod - 1);
+                preparedStatement.setInt(2, startingYear + timePeriod);
             }
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -1801,10 +1821,10 @@ public class JDBCConnection {
             if(region != 0){
                 preparedStatement.setString(1, selectedRegion);
                 preparedStatement.setInt(2, startingYear);
-                preparedStatement.setInt(3, startingYear + timePeriod - 1);
+                preparedStatement.setInt(3, startingYear + timePeriod);
             } else {
                 preparedStatement.setInt(1, startingYear);
-                preparedStatement.setInt(2, startingYear + timePeriod - 1);
+                preparedStatement.setInt(2, startingYear + timePeriod);
             }
 
             resultSet = preparedStatement.executeQuery();
@@ -1837,10 +1857,10 @@ public class JDBCConnection {
             if(region != 0){
                 preparedStatement.setString(1, selectedRegion);
                 preparedStatement.setInt(2, startingYear);
-                preparedStatement.setInt(3, startingYear + timePeriod - 1);
+                preparedStatement.setInt(3, startingYear + timePeriod);
             } else {
                 preparedStatement.setInt(1, startingYear);
-                preparedStatement.setInt(2, startingYear + timePeriod - 1);
+                preparedStatement.setInt(2, startingYear + timePeriod);
             }
             
             resultSet = preparedStatement.executeQuery();
@@ -1858,7 +1878,7 @@ public class JDBCConnection {
 
             preparedStatement.close();
 
-            result = new SubTaskA(startingYear, startingYear + timePeriod - 1, timePeriod, avg, averageTempDifference, selectedRegion, region);
+            result = new SubTaskA(startingYear, startingYear + timePeriod, timePeriod, avg, averageTempDifference, selectedRegion, region);
 
         } catch (SQLException e) {
             System.err.println(e.getMessage());
