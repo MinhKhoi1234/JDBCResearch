@@ -33,9 +33,9 @@ public class Main {
         test1.setNumberOfSimResults(20);
 
         ArrayList<SubTaskB> test = new ArrayList<SubTaskB>();
-        test = jdbcConnection.subTaskBTask2(1990, 10, "Vietnam", 1, 1, 2, true, false);
+        test = jdbcConnection.subTaskBTask2(1990, 10, "Vietnam", 1, 3, 2, false, true);
         if (!test.isEmpty()) {
-            for(int i = 0; i < test1.getNumberOfSimResults(); i++){
+            for(int i = 0; i < 10; i++){
                 System.out.println(test.get(i).toString());
             }
         } else {
@@ -59,7 +59,7 @@ public class Main {
         // mostSimilar true -> most similar, false -> least similar
 
         ArrayList<SubTaskB>  test = new ArrayList<SubTaskB>();
-        test = jdbcConnection.subTaskBTask1(1990, 10, "Vietnam", 1, 3, 1, true);
+        test = jdbcConnection.subTaskBTask1(1990, 10, "Vietnam", 1, 3, 1, false);
         if (!test.isEmpty()) {
             for(int i = 0; i < 10; i++){
                 System.out.println(test.get(i).toString());
@@ -71,8 +71,9 @@ public class Main {
         long endTime = System.currentTimeMillis();
         long executionTime = endTime - startTime;
         System.out.println("Execution Time: " + executionTime + " milliseconds");
-        */
         
+        */
+
         /* 
         // Sub Task A
 

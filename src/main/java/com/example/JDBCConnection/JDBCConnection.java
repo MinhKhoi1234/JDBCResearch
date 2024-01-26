@@ -443,7 +443,7 @@ public class JDBCConnection {
 
     // subTask B
 
-    public ArrayList<SubTaskB> subTaskBTask1(int startingYear, int timePeriod, String selectedRegion, int region, int option, int mode, boolean mostSimilar, int numResults) {
+    public ArrayList<SubTaskB> subTaskBTask1(int startingYear, int timePeriod, String selectedRegion, int region, int option, int mode, boolean mostSimilar) {
         // region 1  = country, 2 = state, 3 = city
         // option 1 = temperature, 2 = population, 3 = both
         // mode 1 = absolute, 2 = relative
@@ -746,7 +746,7 @@ public class JDBCConnection {
                 else{
                     similarRate = Math.abs((average - avg) / avg) * 100;
                 }
-                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, 0, (int) average, similarRate, selectedRegion, 1);
+                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, 0, (long) average, similarRate, selectedRegion, 1);
                 result.add(temp);
                 statement.close();
             }
@@ -877,7 +877,7 @@ public class JDBCConnection {
                 else{
                     similarRate = Math.sqrt(Math.pow(((averageTemp - avgTemp) / avgTemp) * 100, 2) + Math.pow(((averagePopulation - avgPopulation) / avgPopulation) * 100, 2));
                 }
-                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, averageTemp, (int) averagePopulation, similarRate, selectedRegion, 1);
+                SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, averageTemp, (long) averagePopulation, similarRate, selectedRegion, 1);
                 result.add(temp);
             }
 
@@ -1247,7 +1247,7 @@ public class JDBCConnection {
                         similarRate = Math.abs((average - avg) / avg) * 100;
                     }
 
-                    SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, 0, (int) average, similarRate, currentRegion, 1);
+                    SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, 0, (long) average, similarRate, currentRegion, 1);
                     avgTemp.add(temp);
 
                     preparedStatement.close();
@@ -1434,7 +1434,7 @@ public class JDBCConnection {
                         differenceScore = Math.sqrt(Math.pow(((averageTemp - avgTemp) / avgTemp) * 100, 2) + Math.pow(((averagePopulation - avgPopulation) / avgPopulation) * 100, 2));
                     }
 
-                    SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, averageTemp, (int) averagePopulation, differenceScore, currentRegion, 1);
+                    SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, timePeriod, averageTemp, (long) averagePopulation, differenceScore, currentRegion, 1);
                     tempList.add(temp);
 
                 }
@@ -1538,6 +1538,14 @@ public class JDBCConnection {
 
 
     // Subtask A
+    public ArrayList<SubTaskA> SubTaskATask2 (int startingYear, int timePeriod, String selectedRegion, int region){
+        ArrayList<SubTaskA> result = new ArrayList<SubTaskA>();
+
+        SubTaskA temp = differenceInAverage(startingYear, timePeriod, selectedRegion, region);
+        result.add(temp);
+
+        return result;
+    }
 
 
     public ArrayList<SubTaskA> SubTaskATask4 (int[] startingYears, int timePeriod, String[] selectedRegions, int region){
