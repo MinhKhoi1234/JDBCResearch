@@ -9,6 +9,9 @@ public class SubTaskA {
     private double averageTempDifference;
     private String regionName;
     private int type;
+    private double fromValue;
+    private double toValue;
+
 
     public SubTaskA(){
     }
@@ -23,11 +26,29 @@ public class SubTaskA {
         this.type = type;
     }
 
-    public SubTaskA (double averageTemp, long averagePopulation, String regionName, int type){
+    public SubTaskA (double averageTemp, long averagePopulation, String regionName, int type, double fromValue, double toValue){
         this.averageTemp = averageTemp;
         this.averagePopulation = averagePopulation;
         this.regionName = regionName;
         this.type = type;
+        this.fromValue = fromValue;
+        this.toValue = toValue;
+    }
+
+    public double getFromValue() {
+        return fromValue;
+    }
+
+    public void setFromValue(double fromValue) {
+        this.fromValue = fromValue;
+    }
+
+    public double getToValue() {
+        return toValue;
+    }
+
+    public void setToValue(double toValue) {
+        this.toValue = toValue;
     }
 
     public long getAveragePopulation() {
@@ -101,6 +122,8 @@ public class SubTaskA {
                 "\nStarting year: " + startingYear + 
                 "\nEnding Year: " + endingYear + 
                 "\nTime Period: " + timePeriod +
+                "\nfromValue: " + fromValue +
+                "\ntoValue: " + toValue +
                 "\nAverage Population: " + averagePopulation +
                 "\nAverage Temperature: " + averageTemp +
                 "\nAverage Temperature difference: " + averageTempDifference + "\n\n";

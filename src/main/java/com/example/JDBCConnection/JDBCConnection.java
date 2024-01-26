@@ -1593,11 +1593,11 @@ public class JDBCConnection {
             while (resultSet.next()) {
                 switch(mode){
                     case 1:
-                        SubTaskA temp = new SubTaskA(resultSet.getDouble("Avg"), 0, resultSet.getString("Country"), 1);
+                        SubTaskA temp = new SubTaskA(resultSet.getDouble("Avg"), 0, resultSet.getString("Country"), 1, startValue, endValue);
                         data.add(temp);
                         break;
                     case 2:
-                        SubTaskA temp2 = new SubTaskA(0, resultSet.getLong("Population"), resultSet.getString("Country_Name"), 1);
+                        SubTaskA temp2 = new SubTaskA(0, resultSet.getLong("Population"), resultSet.getString("Country_Name"), 1, startValue, endValue);
                         data.add(temp2);
                         break;
                 }
