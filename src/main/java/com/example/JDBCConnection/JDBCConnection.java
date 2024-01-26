@@ -496,46 +496,64 @@ public class JDBCConnection {
 
             switch(region){
                 case 1:
-                    query = query + " (SELECT 1 FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "' AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "')";
+                    query = query + " (SELECT 1 FROM GlobalYearlyLandTempByCountry WHERE Country = ? AND (Year BETWEEN ? AND ?))";
                     break;
                 case 2:
-                    query = query + " (SELECT 1 FROM GlobalYearlyLandTempByState WHERE State = '" + selectedRegion + "' AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "'))";
+                    query = query + " (SELECT 1 FROM GlobalYearlyLandTempByState WHERE State = ? AND (Year BETWEEN ? AND ?))";
                     break;
                 case 3:
-                    query = query + " (SELECT 1 FROM GlobalYearlyLandTempByCity WHERE City = '" + selectedRegion + "'  AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "'))";
+                    query = query + " (SELECT 1 FROM GlobalYearlyLandTempByCity WHERE City = ? AND (Year BETWEEN ? AND ?))";
                     break;
             }
-            
-            ResultSet resultSet = statement.executeQuery(query);
+
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            // Set the parameters and execute the query
+            preparedStatement.setString(1, selectedRegion);
+            preparedStatement.setInt(2, startingYear);
+            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
             if (resultSet.next() && !resultSet.getBoolean(1)) {
                 System.out.println("Does not exist\n");
                 System.out.println(selectedRegion);
                 return result;
             }
+            
+            preparedStatement.close();
+            resultSet.close();
 
             //Find available first and last year
             query = "SELECT MIN(Year) AS Min, MAX(Year) AS Max";
 
             switch(region){
                 case 1:
-                    query = query + " FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "'";
+                    query = query + " FROM GlobalYearlyLandTempByCountry WHERE Country = ?";
                     break;
                 case 2:
-                    query = query + " FROM GlobalYearlyLandTempByState WHERE State = '" + selectedRegion + "'";
+                    query = query + " FROM GlobalYearlyLandTempByState WHERE State = ?";
                     break;
                 case 3:
-                    query = query + " FROM GlobalYearlyLandTempByCity WHERE City = '" + selectedRegion + "'";
+                    query = query + " FROM GlobalYearlyLandTempByCity WHERE City = ?";
                     break;
             }
 
+            preparedStatement = connection.prepareStatement(query);
+
+            // Set the parameters and execute the query
+            preparedStatement.setString(1, selectedRegion);
+            ResultSet results = preparedStatement.executeQuery();
+
             int beginYear = 0;
             int endYear = 0;
-            ResultSet results = statement.executeQuery(query);
             if (results.next()){
                 beginYear = results.getInt("Min");
                 endYear = results.getInt("Max");
             }
-            statement.close();
+
+            // Don't forget to close the statement and the result set
+            preparedStatement.close();
+            results.close();
 
 
             //Find average temperature of the selected region in a certain time period
@@ -543,23 +561,31 @@ public class JDBCConnection {
 
             switch(region){
                 case 1:
-                    query = query + "FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "' AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "')";
+                    query = query + "FROM GlobalYearlyLandTempByCountry WHERE Country = ? AND (Year BETWEEN ? AND ?)";
                     break;
                 case 2:
-                    query = query + "FROM GlobalYearlyLandTempByState WHERE State = '" + selectedRegion + "' AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "')";
+                    query = query + "FROM GlobalYearlyLandTempByState WHERE State = ? AND (Year BETWEEN ? AND ?)";
                     break;
                 case 3:
-                    query = query + "FROM GlobalYearlyLandTempByCity WHERE City = '" + selectedRegion + "' AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "')";
+                    query = query + "FROM GlobalYearlyLandTempByCity WHERE City = ? AND (Year BETWEEN ? AND ?)";
                     break;
             }
 
-            results = statement.executeQuery(query);
+            preparedStatement = connection.prepareStatement(query);
+
+            // Set the parameters and execute the query
+            preparedStatement.setString(1, selectedRegion);
+            preparedStatement.setInt(2, startingYear);
+            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            results = preparedStatement.executeQuery();
+
             double avg = 0;
             while (results.next()) {
                 avg = results.getDouble("Avg");
             }
 
-            statement.close();
+            preparedStatement.close();
+            results.close();
 
             //Find average temperature of the selected region in various time period
             double average;
@@ -570,25 +596,39 @@ public class JDBCConnection {
 
                 switch(region){
                     case 1:
-                        query = query + "FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "' AND (Year BETWEEN'" + i + "' AND '" + (i + timePeriod - 1) + "')";
+                        query = query + "FROM GlobalYearlyLandTempByCountry WHERE Country = ? AND (Year BETWEEN ? AND ?)";
                         break;
                     case 2:
-                        query = query + "FROM GlobalYearlyLandTempByState WHERE State = '" + selectedRegion + "' AND (Year BETWEEN'" + i + "' AND '" + (i + timePeriod - 1) + "')";
+                        query = query + "FROM GlobalYearlyLandTempByState WHERE State = ? AND (Year BETWEEN ? AND ?)";
                         break;
                     case 3:
-                        query = query + "FROM GlobalYearlyLandTempByCity WHERE City = '" + selectedRegion + "' AND (Year BETWEEN'" + i + "' AND '" + (i + timePeriod - 1) + "')";
+                        query = query + "FROM GlobalYearlyLandTempByCity WHERE City = ? AND (Year BETWEEN ? AND ?)";
                         break;
                 }
-                results = statement.executeQuery(query);
+
+                preparedStatement = connection.prepareStatement(query);
+
+                // Set the parameters and execute the query
+                preparedStatement.setString(1, selectedRegion);
+                preparedStatement.setInt(2, i);
+                preparedStatement.setInt(3, i + timePeriod - 1);
+                results = preparedStatement.executeQuery();
+
                 while (results.next()) {
                     average = results.getDouble("Avg");
                 }
+
+                preparedStatement.close();
+                results.close();
+
                 if (mode == 1){
                     similarRate = Math.abs(average - avg);
                 }
                 else{
                     similarRate = Math.abs((average - avg) / avg) * 100;
                 }
+
+
                 SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, average, 0, similarRate, selectedRegion, region);
                 result.add(temp);
                 statement.close();
@@ -621,48 +661,85 @@ public class JDBCConnection {
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);
 
-            //Check if the country exists
-            String query = "SELECT EXISTS (SELECT 1 FROM Population WHERE Country_Name = '" + selectedRegion + "' AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "'))";
-            
-            ResultSet resultSet = statement.executeQuery(query);
+            // Prepare the SQL query
+            String query = "SELECT EXISTS (SELECT 1 FROM Population WHERE Country_Name = ? AND (Year BETWEEN ? AND ?))";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            // Set the parameters and execute the query
+            preparedStatement.setString(1, selectedRegion);
+            preparedStatement.setInt(2, startingYear);
+            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
             if (resultSet.next() && !resultSet.getBoolean(1)) {
                 System.out.println("Does not exist\n");
                 return result;
             }
 
-            //Find available first and last year
-            query = "SELECT MIN(Year) AS Min, MAX(Year) AS Max FROM Population WHERE Country_Name = '" + selectedRegion + "'";
+            
+            preparedStatement.close();
+            resultSet.close();
+
+            
+            query = "SELECT MIN(Year) AS Min, MAX(Year) AS Max FROM Population WHERE Country_Name = ?";
+            preparedStatement = connection.prepareStatement(query);
+
+            // Set the parameters and execute the query
+            preparedStatement.setString(1, selectedRegion);
+            ResultSet results = preparedStatement.executeQuery();
 
             int beginYear = 0;
             int endYear = 0;
-            ResultSet results = statement.executeQuery(query);
             if (results.next()){
                 beginYear = results.getInt("Min");
                 endYear = results.getInt("Max");
             }
-            statement.close();
+
+            preparedStatement.close();
+            results.close();
 
 
-            //Find average population of the selected region in a certain time period
-            query = "SELECT AVG(Population) AS Avg FROM Population WHERE Country_Name = '" + selectedRegion + "' AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "')";
-            results = statement.executeQuery(query);
+            // Prepare the SQL query
+            query = "SELECT AVG(Population) AS Avg FROM Population WHERE Country_Name = ? AND (Year BETWEEN ? AND ?)";
+            preparedStatement = connection.prepareStatement(query);
+
+            // Set the parameters and execute the query
+            preparedStatement.setString(1, selectedRegion);
+            preparedStatement.setInt(2, startingYear);
+            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            results = preparedStatement.executeQuery();
+
             double avg = 0;
             while (results.next()) {
                 avg = results.getDouble("Avg");
             }
 
-            statement.close();
+            // Don't forget to close the statement and the result set
+            preparedStatement.close();
+            results.close();
 
-            //Find average temperature of the selected region in various time period
+            //Find average population of the selected region in various time period
             double average;
             double similarRate;
             for(int i = beginYear; i <= endYear - (timePeriod - 1); i++){
                 average = 0;
-                query = "SELECT AVG(Population) AS Avg FROM Population WHERE Country_Name = '" + selectedRegion + "' AND (Year BETWEEN'" + i + "' AND '" + (i + timePeriod - 1) + "')";
-                results = statement.executeQuery(query);
+
+                query = "SELECT AVG(Population) AS Avg FROM Population WHERE Country_Name = ? AND (Year BETWEEN ? AND ?)";
+                preparedStatement = connection.prepareStatement(query);
+
+                preparedStatement.setString(1, selectedRegion);
+                preparedStatement.setInt(2, i);
+                preparedStatement.setInt(3, i + timePeriod - 1);
+                results = preparedStatement.executeQuery();
+
                 while (results.next()) {
                     average = results.getDouble("Avg");
                 }
+
+                preparedStatement.close();
+                results.close();
+
+
                 if (mode == 1){
                     similarRate = Math.abs(average - avg);
                 }
@@ -710,38 +787,51 @@ public class JDBCConnection {
                 return result;
             }
 
-            //Find available first and last year
-            query = "SELECT MIN(Year) AS Min, MAX(Year) AS Max FROM Population WHERE Country_Name = '" + selectedRegion + "' ";
+            // Prepare the SQL query
+            query = "SELECT MIN(Year) AS Min, MAX(Year) AS Max FROM Population WHERE Country_Name = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            // Set the parameters and execute the query
+            preparedStatement.setString(1, selectedRegion);
+            ResultSet results = preparedStatement.executeQuery();
 
             int beginYear = 0;
             int endYear = 0;
-            ResultSet results = statement.executeQuery(query);
             if (results.next()){
                 beginYear = results.getInt("Min");
                 endYear = results.getInt("Max");
             }
-            statement.close();
+
+            // Don't forget to close the statement and the result set
+            preparedStatement.close();
+            results.close();
 
 
-            //Find average population of the selected region in a certain time period
-            query = "SELECT AVG(Population) AS Avg FROM Population WHERE Country_Name = '" + selectedRegion + "' AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "')";
-            results = statement.executeQuery(query);
+            // Find average population of the selected region in a certain time period
+            query = "SELECT AVG(Population) AS Avg FROM Population WHERE Country_Name = ? AND (Year BETWEEN ? AND ?)";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, selectedRegion);
+            preparedStatement.setInt(2, startingYear);
+            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            results = preparedStatement.executeQuery();
             double avgPopulation = 0;
             while (results.next()) {
                 avgPopulation = results.getDouble("Avg");
             }
+            preparedStatement.close();
 
-            statement.close();
-
-            //Find average temperature of the selected region in a certain time period
-            query = "SELECT AVG(AverageTemperature) AS Avg FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "' AND (Year BETWEEN'" + startingYear + "' AND '" + (startingYear + timePeriod - 1) + "')";
-            results = statement.executeQuery(query);
+            // Find average temperature of the selected region in a certain time period
+            query = "SELECT AVG(AverageTemperature) AS Avg FROM GlobalYearlyLandTempByCountry WHERE Country = ? AND (Year BETWEEN ? AND ?)";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, selectedRegion);
+            preparedStatement.setInt(2, startingYear);
+            preparedStatement.setInt(3, startingYear + timePeriod - 1);
+            results = preparedStatement.executeQuery();
             double avgTemp = 0;
             while (results.next()) {
                 avgTemp = results.getDouble("Avg");
             }
-
-            statement.close();
+            preparedStatement.close();
 
             //Find average temperature of the selected region in various time period
             double averageTemp;
@@ -752,17 +842,34 @@ public class JDBCConnection {
                 averageTemp = 0;
                 averagePopulation = 0;
 
-                query = "SELECT AVG(Population) AS Avg FROM Population WHERE Country_Name = '" + selectedRegion + "' AND (Year BETWEEN'" + i + "' AND '" + (i + timePeriod - 1) + "')";
-                results = statement.executeQuery(query);
+                // Prepare the SQL queries
+                String populationQuery = "SELECT AVG(Population) AS Avg FROM Population WHERE Country_Name = ? AND (Year BETWEEN ? AND ?)";
+                PreparedStatement populationStatement = connection.prepareStatement(populationQuery);
+
+                String temperatureQuery = "SELECT AVG(AverageTemperature) AS Avg FROM GlobalYearlyLandTempByCountry WHERE Country = ? AND (Year BETWEEN ? AND ?)";
+                PreparedStatement temperatureStatement = connection.prepareStatement(temperatureQuery);
+
+                // Set the parameters and execute the queries
+                populationStatement.setString(1, selectedRegion);
+                populationStatement.setInt(2, i);
+                populationStatement.setInt(3, i + timePeriod - 1);
+                results = populationStatement.executeQuery();
                 while (results.next()) {
                     averagePopulation = results.getDouble("Avg");
                 }
 
-                query = "SELECT AVG(AverageTemperature) AS Avg FROM GlobalYearlyLandTempByCountry WHERE Country = '" + selectedRegion + "' AND (Year BETWEEN'" + i + "' AND '" + (i + timePeriod - 1) + "')";
-                results = statement.executeQuery(query);
+                temperatureStatement.setString(1, selectedRegion);
+                temperatureStatement.setInt(2, i);
+                temperatureStatement.setInt(3, i + timePeriod - 1);
+                results = temperatureStatement.executeQuery();
                 while (results.next()) {
                     averageTemp = results.getDouble("Avg");
                 }
+
+                // Don't forget to close the statements and the result set
+                populationStatement.close();
+                temperatureStatement.close();
+                results.close();
 
                 if (mode == 1){
                     similarRate = Math.sqrt(Math.pow(averageTemp - avgTemp, 2) + Math.pow(averagePopulation - avgPopulation, 2));
@@ -772,7 +879,6 @@ public class JDBCConnection {
                 }
                 SubTaskB temp = new SubTaskB(i, i + timePeriod - 1, averageTemp, (int) averagePopulation, similarRate, selectedRegion, 1);
                 result.add(temp);
-                statement.close();
             }
 
 
