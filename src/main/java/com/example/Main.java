@@ -31,7 +31,7 @@ public class Main {
 
 
         ArrayList<SubTaskB> test = new ArrayList<SubTaskB>();
-        test = jdbcConnection.subTaskBTask2(1990, 10, "Vietnam", 1, 2, 2, true, false);
+        test = jdbcConnection.subTaskBTask2(1990, 10, "Vietnam", 1, 3, 2, true, false);
         if (!test.isEmpty()) {
             for(int i = 0; i < 10; i++){
                 System.out.println(test.get(i).toString());

@@ -1110,7 +1110,6 @@ public class JDBCConnection {
                 if (results.next()){
                     beginYear = results.getInt("Min");
                     endYear = results.getInt("Max");
-                    System.out.println("Success");
                 }
                 preparedStatement.close();
 
@@ -1206,22 +1205,6 @@ public class JDBCConnection {
             
             preparedStatement.close();
 
-            //Find available first and last year
-
-            query = "SELECT MIN(Year) AS Min, MAX(Year) AS Max FROM Population WHERE Country_Name = ?";
-            int beginYear = 0;
-            int endYear = 0;
-
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, selectedRegion);
-            ResultSet results = preparedStatement.executeQuery();
-
-            if (results.next()){
-                beginYear = results.getInt("Min");
-                endYear = results.getInt("Max");
-            }
-            preparedStatement.close();
-
             // Prepare and execute the first query
             String query1 = "SELECT AVG(Population.Population) AS AvgPopulation " +
             "FROM Population " +
@@ -1263,7 +1246,7 @@ public class JDBCConnection {
                "JOIN GlobalYearlyLandTempByCountry ON Population.Country_Name = GlobalYearlyLandTempByCountry.Country";
 
             preparedStatement = connection.prepareStatement(query);
-            results = preparedStatement.executeQuery();
+            ResultSet results = preparedStatement.executeQuery();
 
             ArrayList<String> data = new ArrayList<>();
             while (results.next()) {
@@ -1295,6 +1278,22 @@ public class JDBCConnection {
 
                 preparedStatement1.setString(1, currentRegion);
                 preparedStatement2.setString(1, currentRegion);
+
+                //Find available first and last year
+
+                query = "SELECT MIN(Year) AS Min, MAX(Year) AS Max FROM Population WHERE Country_Name = ?";
+                int beginYear = 0;
+                int endYear = 0;
+
+                preparedStatement = connection.prepareStatement(query);
+                preparedStatement.setString(1, selectedRegion);
+                results = preparedStatement.executeQuery();
+
+                if (results.next()){
+                    beginYear = results.getInt("Min");
+                    endYear = results.getInt("Max");
+                }
+                preparedStatement.close();
 
                 //Find average population and temperature of the selected region in various time period and then get the highest similar rate
                 for(int i = beginYear; i <= endYear - (timePeriod - 1); i++){
