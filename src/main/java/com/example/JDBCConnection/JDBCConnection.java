@@ -1666,14 +1666,33 @@ public class JDBCConnection {
         return result;
     }
 
-    public ArrayList<SubTaskA> SubTaskATask4WithFilter (int[] startingYears, int timePeriod, String[] selectedRegions, int region){
+    public ArrayList<SubTaskA> SubTaskATask4WithFilter (int[] startingYears, int timePeriod, String[] selectedRegions, int region, double startValue, double endValue, int mode){
+        ArrayList<SubTaskA> data = new ArrayList<SubTaskA>();
         ArrayList<SubTaskA> result = new ArrayList<SubTaskA>();
+
 
         for(String selectedRegion : selectedRegions){
             for(int startingYear : startingYears){
                 SubTaskA temp = differenceInAverage(startingYear, timePeriod, selectedRegion, region);
-                result.add(temp);
+                data.add(temp);
             }
+        }
+
+        switch(mode){
+            case 1:
+                for(SubTaskA temp : data){
+                    if(temp.getAverageTemp() >= startValue && temp.getAverageTemp() <= endValue){
+                        result.add(temp);
+                    }
+                }
+                break;
+            case 2:
+                for(SubTaskA temp : data){
+                    if(temp.getAveragePopulation() >= startValue && temp.getAveragePopulation() <= endValue){
+                        result.add(temp);
+                    }
+                }
+                break;
         }
 
         return result;
@@ -1876,9 +1895,21 @@ public class JDBCConnection {
             }
             double averageTempDifference = Math.abs((maxTotal - minTotal) / timePeriod);
 
+            query = "SELECT AVG(Population) AS AVG FROM Population WHERE Country_Name = ? AND Year BETWEEN ? AND ?";
+
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, selectedRegion);
+            preparedStatement.setInt(2, startingYear);
+            preparedStatement.setInt(3, startingYear + timePeriod);
+            resultSet = preparedStatement.executeQuery();
+            double avgPopulation = 0;
+            while (resultSet.next()) {
+                avgPopulation = resultSet.getDouble("Avg");
+            }
+
             preparedStatement.close();
 
-            result = new SubTaskA(startingYear, startingYear + timePeriod, timePeriod, avg, averageTempDifference, selectedRegion, region);
+            result = new SubTaskA(startingYear, startingYear + timePeriod, timePeriod, avg, averageTempDifference, (long) avgPopulation, selectedRegion, region);
 
         } catch (SQLException e) {
             System.err.println(e.getMessage());

@@ -16,13 +16,15 @@ public class SubTaskA {
     public SubTaskA(){
     }
 
-    public SubTaskA (int startingYear, int endingYear, int timePeriod, double averageTemp, double averageTempDifference, String regionName, int type){
+    public SubTaskA (int startingYear, int endingYear, int timePeriod, double averageTemp, double averageTempDifference, long averagePopulation, String regionName, int type){
         this.startingYear = startingYear;
         this.endingYear = endingYear;
         this.timePeriod = timePeriod;
         this.averageTemp = averageTemp;
         this.averageTempDifference = averageTempDifference;
+        this.averagePopulation = averagePopulation;
         this.regionName = regionName;
+
         this.type = type;
     }
 
