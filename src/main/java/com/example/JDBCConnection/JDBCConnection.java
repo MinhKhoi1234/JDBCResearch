@@ -13,7 +13,6 @@ import java.util.Comparator;
 import com.example.model.Input;
 import com.example.model.SubTaskA;
 import com.example.model.SubTaskB;
-import com.mysql.cj.x.protobuf.MysqlxDatatypes.Array;
 
 public class JDBCConnection {
     public JDBCConnection() {
@@ -1067,7 +1066,6 @@ public class JDBCConnection {
 
                 preparedStatement = connection.prepareStatement(query);
                 preparedStatement.setString(1, currentRegion);
-                results = preparedStatement.executeQuery();
 
                 results = preparedStatement.executeQuery();
                 if (results.next()){
