@@ -1672,7 +1672,7 @@ public class JDBCConnection {
         return result;
     }
 
-    public ArrayList<SubTaskA> SubTaskATask4WithFilter (int[] startingYears, int timePeriod, String[] selectedRegions, int region, double startValue, double endValue, int mode, boolean Desc){
+    public ArrayList<SubTaskA> SubTaskATask4WithFilter (int[] startingYears, int timePeriod, String[] selectedRegions, int region, double startValue, double endValue, int mode, boolean sortByPopulation, boolean Desc){
         ArrayList<SubTaskA> data = new ArrayList<SubTaskA>();
         ArrayList<SubTaskA> result = new ArrayList<SubTaskA>();
 
@@ -1692,11 +1692,6 @@ public class JDBCConnection {
                     }
                 }
 
-                if(Desc){
-                    TaskASortDESCAvgTemp(result);
-                } else {
-                    TaskASortASCAvgTemp(result);
-                }
                 break;
             case 2:
                 for(SubTaskA temp : data){
@@ -1705,12 +1700,22 @@ public class JDBCConnection {
                     }
                 }
 
-                if(Desc){
-                    TaskASortDESCPopulation(result);
-                } else {
-                    TaskASortASCPopulation(result);
-                }
                 break;
+        }
+
+        if(sortByPopulation){
+            if(Desc){
+                TaskASortDESCPopulation(result);
+            } else {
+                TaskASortASCPopulation(result);
+            }
+        }
+        else{
+            if(Desc){
+                TaskASortDESCAvgTemp(result);
+            } else {
+                TaskASortASCAvgTemp(result);
+            }
         }
 
         return result;
