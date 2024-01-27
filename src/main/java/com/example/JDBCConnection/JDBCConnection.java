@@ -1918,20 +1918,23 @@ public class JDBCConnection {
             }
             double averageTempDifference = Math.abs((maxTotal - minTotal) / timePeriod);
 
-            query = "SELECT AVG(Population) AS AVG FROM Population WHERE Country_Name = ? AND Year BETWEEN ? AND ?";
-
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, selectedRegion);
-            preparedStatement.setInt(2, startingYear);
-            preparedStatement.setInt(3, startingYear + timePeriod);
-            resultSet = preparedStatement.executeQuery();
-            double avgPopulation = 0;
-            while (resultSet.next()) {
-                avgPopulation = resultSet.getDouble("Avg");
-            }
-
             preparedStatement.close();
 
+            double avgPopulation = 0;
+            if(region == 1){
+                query = "SELECT AVG(Population) AS AVG FROM Population WHERE Country_Name = ? AND Year BETWEEN ? AND ?";
+
+                preparedStatement = connection.prepareStatement(query);
+                preparedStatement.setString(1, selectedRegion);
+                preparedStatement.setInt(2, startingYear);
+                preparedStatement.setInt(3, startingYear + timePeriod);
+                resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    avgPopulation = resultSet.getDouble("Avg");
+                }
+
+                preparedStatement.close();
+            }
             result = new SubTaskA(startingYear, startingYear + timePeriod, timePeriod, avg, averageTempDifference, (long) avgPopulation, selectedRegion, region);
 
         } catch (SQLException e) {

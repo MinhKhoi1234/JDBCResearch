@@ -18,7 +18,7 @@ public class Main {
         // System.out.println(jdbcConnection.getCityAndTemp("Vietnam", "City", 1990, 2000).get(2).getAvgTemp());
         //Write the system.out.print to test here
 
-        
+        /*
         // Task 2
 
         // region 1  = country, 2 = state, 3 = city
@@ -47,7 +47,7 @@ public class Main {
         System.out.println("Execution Time: " + executionTime + " milliseconds");
         
         
-        
+        */
 
         /*
         // Task 1
@@ -74,7 +74,7 @@ public class Main {
         
         */
 
-        /* 
+        
         // Sub Task A
 
         long startTime = System.currentTimeMillis();
@@ -84,22 +84,19 @@ public class Main {
         String[] country = {"Vietnam", "Thailand", "Singapore", "Malaysia"};
 
 
-        ArrayList<SubTaskA> test = null;
-        test = jdbcConnection.SubTaskATask6(100000, 2000000, 2);
-        if (!test.isEmpty()) {
-            for(int i = 0; i < test.size(); i++){
-                System.out.println(test.get(i).toString());
-            }
-        } else {
+        ArrayList<SubTaskA> ArrayListD = jdbcConnection.SubTaskATask4WithFilter(startingYears, 10, country, 1, 27 , 9.0E7, 1, true, true);
+        System.out.println("Task 4");
+
+        if(ArrayListD.isEmpty()){
             System.out.println("The list is empty");
+        }
+        for (int i = 0; i < ArrayListD.size(); i++) {
+            System.out.println(ArrayListD.get(i).toString());
         }
 
         long endTime = System.currentTimeMillis();
         long executionTime = endTime - startTime;
         System.out.println("Execution Time: " + executionTime + " milliseconds");
         
-        test = jdbcConnection.TaskASortHighToLowATD(test);
-        test = jdbcConnection.TaskASortHighToLowATD(test);
-        */
     }
 }
