@@ -1653,7 +1653,7 @@ public class JDBCConnection {
     }
 
 
-    public ArrayList<SubTaskA> SubTaskATask4NoFilter (int[] startingYears, int timePeriod, String[] selectedRegions, int region){
+    public ArrayList<SubTaskA> SubTaskATask4NoFilter (int[] startingYears, int timePeriod, String[] selectedRegions, int region, boolean Desc){
         ArrayList<SubTaskA> result = new ArrayList<SubTaskA>();
 
         for(String selectedRegion : selectedRegions){
@@ -1663,10 +1663,16 @@ public class JDBCConnection {
             }
         }
 
+        if(Desc){
+            TaskASortDescATD(result);
+        } else {
+            TaskASortAscATD(result);
+        }
+
         return result;
     }
 
-    public ArrayList<SubTaskA> SubTaskATask4WithFilter (int[] startingYears, int timePeriod, String[] selectedRegions, int region, double startValue, double endValue, int mode){
+    public ArrayList<SubTaskA> SubTaskATask4WithFilter (int[] startingYears, int timePeriod, String[] selectedRegions, int region, double startValue, double endValue, int mode, boolean Desc){
         ArrayList<SubTaskA> data = new ArrayList<SubTaskA>();
         ArrayList<SubTaskA> result = new ArrayList<SubTaskA>();
 
@@ -1685,12 +1691,24 @@ public class JDBCConnection {
                         result.add(temp);
                     }
                 }
+
+                if(Desc){
+                    TaskASortDESCAvgTemp(result);
+                } else {
+                    TaskASortASCAvgTemp(result);
+                }
                 break;
             case 2:
                 for(SubTaskA temp : data){
                     if(temp.getAveragePopulation() >= startValue && temp.getAveragePopulation() <= endValue){
                         result.add(temp);
                     }
+                }
+
+                if(Desc){
+                    TaskASortDESCPopulation(result);
+                } else {
+                    TaskASortASCPopulation(result);
                 }
                 break;
         }
@@ -1927,7 +1945,7 @@ public class JDBCConnection {
         return result;
     }
 
-    public ArrayList<SubTaskA> TaskASortLowToHighATD (ArrayList<SubTaskA> data){
+    public ArrayList<SubTaskA> TaskASortAscATD (ArrayList<SubTaskA> data){
     
         Collections.sort(data, new Comparator<SubTaskA>() {
             @Override
@@ -1939,7 +1957,7 @@ public class JDBCConnection {
         return data;
     }
 
-    public ArrayList<SubTaskA> TaskASortHighToLowATD (ArrayList<SubTaskA> data){
+    public ArrayList<SubTaskA> TaskASortDescATD (ArrayList<SubTaskA> data){
     
         Collections.sort(data, new Comparator<SubTaskA>() {
             @Override
@@ -1949,5 +1967,60 @@ public class JDBCConnection {
         });
     
         return data;
+    }
+
+    public ArrayList<SubTaskA> TaskASortASCPopulation (ArrayList<SubTaskA> data){
+        
+            Collections.sort(data, new Comparator<SubTaskA>() {
+                @Override
+                public int compare(SubTaskA o1, SubTaskA o2) {
+                    return Long.compare(o1.getAveragePopulation(), o2.getAveragePopulation());
+                }
+            });
+        
+            return data;
+    }
+
+    public ArrayList<SubTaskA> TaskASortDESCPopulation (ArrayList<SubTaskA> data){
+        
+            Collections.sort(data, new Comparator<SubTaskA>() {
+                @Override
+                public int compare(SubTaskA o1, SubTaskA o2) {
+                    return Long.compare(o2.getAveragePopulation(), o1.getAveragePopulation());
+                }
+            });
+        
+            return data;
+    }
+
+    public ArrayList<SubTaskA> TaskASortASCAvgTemp (ArrayList<SubTaskA> data){
+        
+            Collections.sort(data, new Comparator<SubTaskA>() {
+                @Override
+                public int compare(SubTaskA o1, SubTaskA o2) {
+                    return Double.compare(o1.getAverageTemp(), o2.getAverageTemp());
+                }
+            });
+        
+            return data;
+    }
+
+    public ArrayList<SubTaskA> TaskASortDESCAvgTemp (ArrayList<SubTaskA> data){
+        
+            Collections.sort(data, new Comparator<SubTaskA>() {
+                @Override
+                public int compare(SubTaskA o1, SubTaskA o2) {
+                    return Double.compare(o2.getAverageTemp(), o1.getAverageTemp());
+                }
+            });
+        
+            return data;
+    }
+
+    public ArrayList<SubTaskA> ReverseTaskA (ArrayList<SubTaskA> data){
+        
+            Collections.reverse(data);
+        
+            return data;
     }
 }
