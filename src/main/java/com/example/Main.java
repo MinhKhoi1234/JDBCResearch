@@ -27,26 +27,33 @@ public class Main {
         // mostSimilar true -> most similar, false -> least similar
         // omit true -> only take one time period of all regions into account, false -> take all time period of all regions into account
 
-        long startTime = System.currentTimeMillis();
+        // long startTime = System.currentTimeMillis();
 
-        SubTaskB test1 = new SubTaskB();
-        test1.setNumberOfSimResults(20);
+        // SubTaskB test1 = new SubTaskB();
+        // test1.setNumberOfSimResults(20);
 
-        ArrayList<SubTaskB> test = new ArrayList<SubTaskB>();
-        test = jdbcConnection.subTaskBTask2(1990, 10, "Vietnam", 1, 3, 2, false, true);
-        if (!test.isEmpty()) {
-            for(int i = 0; i < 10; i++){
-                System.out.println(test.get(i).toString());
-            }
-        } else {
-            System.out.println("The list is empty");
+        // ArrayList<SubTaskB> test = new ArrayList<SubTaskB>();
+        // test = jdbcConnection.subTaskBTask2(1990, 10, "Vietnam", 1, 2, 2, true, false);
+        // if (!test.isEmpty()) {
+        //     for(int i = 0; i < 10; i++){
+        //         System.out.println(test.get(i).toString());
+        //     }
+        // } else {
+        //     System.out.println("The list is empty");
+        // }
+
+        // long endTime = System.currentTimeMillis();
+        // long executionTime = endTime - startTime;
+        // System.out.println("Execution Time: " + executionTime + " milliseconds");
+        
+        ArrayList<SubTaskB> something = jdbcConnection.subTaskBTask2(1970, 10, "Connecticut", 2, 1, 2, true, true);
+        if (something.size() > 10) {
+          something = new ArrayList<>(something.subList(0, 10));
         }
-
-        long endTime = System.currentTimeMillis();
-        long executionTime = endTime - startTime;
-        System.out.println("Execution Time: " + executionTime + " milliseconds");
-        
-        
+        System.out.println("Task 2");
+        for (int i = 0; i < something.size(); i++) {
+            System.out.println(something.get(i).toString());
+        }
         
 
         /*
@@ -101,5 +108,41 @@ public class Main {
         test = jdbcConnection.TaskASortHighToLowATD(test);
         test = jdbcConnection.TaskASortHighToLowATD(test);
         */
+
+        // Sub Task A Task 3
+
+        // int[] startingYears = {1985, 1990, 1995, 2000};
+        // ArrayList<SubTaskA> ArrayListA = jdbcConnection.SubTaskATask3(startingYears, 10, "Vietnam", 1);
+        // System.out.println("Task 3");
+        // for (int i = 0; i < ArrayListA.size(); i++) {
+        //     System.out.println(ArrayListA.get(i).toString());
+        // }
+
+        // Sub Task A Task 4
+        int[] startingYears = {1985, 1990, 1995, 2000};
+        String[] country = {"Vietnam", "Thailand", "Singapore", "Malaysia"};
+        // ArrayList<SubTaskA> ArrayListA = jdbcConnection.SubTaskATask4NoFilter(startingYears, 10, country, 1);
+        // System.out.println("Task 4");
+        // for (int i = 0; i < ArrayListA.size(); i++) {
+        //     System.out.println(ArrayListA.get(i).toString());
+        // }
+
+        // ArrayList<SubTaskA> ArrayListB = jdbcConnection.SubTaskATask4WithFilter(startingYears, 10, country, 1, 10, 2000000, 1);
+        // System.out.println("Task 4" + ArrayListB.size());
+        // for (int i = 0; i < ArrayListB.size(); i++) {
+        //     System.out.println(ArrayListB.get(i).toString());
+        // }
+
+        // ArrayList<SubTaskA> ArrayListC = jdbcConnection.SubTaskATask4WithFilter(startingYears, 10, country, 1, 100000, 2000000, 2);
+        // System.out.println("Task 4");
+        // for (int i = 0; i < ArrayListC.size(); i++) {
+        //     System.out.println(ArrayListC.get(i).toString());
+        // }
+
+        // ArrayList<SubTaskA> ArrayListD = jdbcConnection.SubTaskATask4WithFilter(startingYears,10,country,1,8.0E7,9.0E7,2,true,true);
+        // System.out.println("Task 4");
+        // for (int i = 0; i < ArrayListD.size(); i++) {
+        //     System.out.println(ArrayListD.get(i).toString());
+        // }
     }
 }
