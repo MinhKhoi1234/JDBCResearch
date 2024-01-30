@@ -1,4 +1,5 @@
 package com.example.model;
+import java.text.DecimalFormat;
 
 public class SubTaskB {
 
@@ -13,6 +14,8 @@ public class SubTaskB {
     private String regionName;
     private int type;
     private int numberOfSimResults;
+
+    DecimalFormat df = new DecimalFormat("#,###.##");
 
     public SubTaskB(){
     }
@@ -36,6 +39,10 @@ public class SubTaskB {
         return temp;
     }
 
+    public String getTempString(){
+        return df.format(temp).replace(',', '.');
+    }
+
     public int getStartingYear(){
         return startingYear;
     }
@@ -50,6 +57,10 @@ public class SubTaskB {
 
     public long getPopulation(){
         return population;
+    }
+
+    public String getPopulationString(){
+        return df.format(population).replace(',', '.');
     }
 
     public int getTimePeriod() {

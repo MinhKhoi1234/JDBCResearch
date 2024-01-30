@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.ArrayList;
+
+
 public class Main {
     public static void main(String[] args) {
         JDBCConnection jdbcConnection = new JDBCConnection();
@@ -144,5 +146,8 @@ public class Main {
         // for (int i = 0; i < ArrayListD.size(); i++) {
         //     System.out.println(ArrayListD.get(i).toString());
         // }
+
+        SubTaskA test = new SubTaskA(30.0, (long) 500000, "Vietnam", 3, 4.0, 5.0);
+        System.out.println(test.getAveragePopulationString());
     }
 }
