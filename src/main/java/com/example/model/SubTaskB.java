@@ -15,6 +15,9 @@ public class SubTaskB {
     private int type;
     private int numberOfSimResults;
 
+    private String tempString;
+    private String populationString;
+
     DecimalFormat df = new DecimalFormat("#,###.##");
 
     public SubTaskB(){
@@ -29,6 +32,9 @@ public class SubTaskB {
         this.differenceScore = differenceScore;
         this.regionName = regionName;
         this.type = type;
+
+        this.tempString = df.format(avgTemp).replace(',', '.');
+        this.populationString = df.format(population).replace(',', '.');
     }
 
     public int getNumberOfSimResults() {
@@ -40,7 +46,7 @@ public class SubTaskB {
     }
 
     public String getTempString(){
-        return df.format(temp).replace(',', '.');
+        return tempString;
     }
 
     public int getStartingYear(){
@@ -60,7 +66,7 @@ public class SubTaskB {
     }
 
     public String getPopulationString(){
-        return df.format(population).replace(',', '.');
+        return populationString;
     }
 
     public int getTimePeriod() {

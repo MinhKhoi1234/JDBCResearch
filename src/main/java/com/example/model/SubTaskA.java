@@ -13,6 +13,10 @@ public class SubTaskA {
     private double fromValue;
     private double toValue;
 
+    private String averagePopulationString;
+    private String averageTempString;
+    private String averageTempDifferenceString;
+
     DecimalFormat df = new DecimalFormat("#,###.##");
 
     public SubTaskA(){
@@ -26,8 +30,11 @@ public class SubTaskA {
         this.averageTempDifference = averageTempDifference;
         this.averagePopulation = averagePopulation;
         this.regionName = regionName;
-
         this.type = type;
+
+        this.averagePopulationString = df.format(averagePopulation).replace(',', '.');
+        this.averageTempString = df.format(averageTemp).replace(',', '.');
+        this.averageTempDifferenceString = df.format(averageTempDifference).replace(',', '.');
     }
 
     public SubTaskA (double averageTemp, long averagePopulation, String regionName, int type, double fromValue, double toValue){
@@ -60,7 +67,7 @@ public class SubTaskA {
     }
 
     public String getAveragePopulationString(){
-        return df.format(averagePopulation).replace(',', '.');
+        return averagePopulationString;
     }
 
     public void setAveragePopulation(long averagePopulation) {
@@ -72,7 +79,7 @@ public class SubTaskA {
     }
 
     public String getAverageTempString(){
-        return df.format(averageTemp).replace(',', '.');
+        return averageTempString;
     }
 
     public int getStartingYear(){
@@ -88,7 +95,7 @@ public class SubTaskA {
     }
 
     public String getAverageTempDifferenceString(){
-        return df.format(averageTempDifference).replace(',', '.');
+        return averageTempDifferenceString;
     }
 
     public String getRegionName(){
